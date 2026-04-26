@@ -1,1 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Reminders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0c0c0f;
+    --surface: #141418;
+    --surface2: #1c1c22;
+    --surface3: #242430;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f5;
+    --muted: #7a7a90;
+    --accent: #6c63ff;
+    --accent2: #a78bfa;
+    --header-h: 58px;
+    --footer-h: 48px;
+    --pill-red: #ff4d6d;
+    --pill-orange: #ff8c42;
+    --pill-yellow: #f7c948;
+    --pill-green: #3dd68c;
+    --pill-blue: #4db8ff;
+    --pill-purple: #a78bfa;
+    --pill-pink: #f472b6;
+    --pill-teal: #2dd4bf;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    touch-action: manipulation;
+  }
+
+  /* ─── LAYOUT ─── */
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    height: 100dvh;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    flex: 0 0 var(--header-h);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(12,12,15,0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: relative;
+    z-index: 10;
+  }
+
+  #logo-btn {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 0;
+    flex: 1;
+  }
+
+  .logo-icon {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(108,99,255,0.4);
+  }
+
+  .logo-text {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .icon-btn:active { transform: scale(0.93); }
+  .icon-btn:hover { background: var(--surface3); border-color: var(--border2); }
+
+  .icon-btn.add-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    font-size: 20px;
+    font-weight: 300;
+    color: #fff;
+    box-shadow: 0 0 14px rgba(108,99,255,0.45);
+  }
+
+  .icon-btn.add-btn:hover { background: #7c74ff; }
+
+  /* ─── FILTER BAR ─── */
+  #filter-bar {
+    flex: 0 0 auto;
+    padding: 10px 16px 6px;
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--border);
+  }
+  #filter-bar::-webkit-scrollbar { display: none; }
+
+  .filter-chip {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Sora', sans-serif;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .filter-chip:active { transform: scale(0.94); }
+  .filter-chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ─── MAIN ─── */
+  main {
+    flex: 1 1 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px 14px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  main::-webkit-scrollbar { width: 3px; }
+  main::-webkit-scrollbar-track { background: transparent; }
+  main::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+  /* ─── EMPTY STATE ─── */
+  #empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    opacity: 0.45;
+    padding-bottom: 60px;
+  }
+  #empty .em-icon { font-size: 44px; }
+  #empty p { font-size: 14px; color: var(--muted); text-align: center; line-height: 1.5; }
+
+  /* ─── REMINDER PILL ─── */
+  .reminder-pill {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.12s, opacity 0.2s;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reminder-pill::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: 14px 0 0 14px;
+    background: var(--pill-color, var(--accent));
+  }
+
+  .reminder-pill:active { transform: scale(0.98); }
+  .reminder-pill.done { opacity: 0.4; }
+  .reminder-pill.done .pill-title { text-decoration: line-through; }
+
+  .pill-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--pill-color, var(--accent));
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .reminder-pill.done .pill-check {
+    background: var(--pill-color, var(--accent));
+  }
+
+  .pill-body { flex: 1; min-width: 0; }
+  .pill-title { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 3px; }
+  .pill-note { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  .pill-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 7px;
+    flex-wrap: wrap;
+  }
+
+  .pill-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    color: #fff;
+    background: var(--pill-color, var(--accent));
+    opacity: 0.85;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .pill-author {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .pill-delete {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 4px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+  .pill-delete:hover { color: var(--pill-red); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    flex: 0 0 var(--footer-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-top: 1px solid var(--border);
+    background: rgba(12,12,15,0.95);
+  }
+
+  .footer-stat {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .footer-btn {
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'Sora', sans-serif;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .footer-btn:hover { color: var(--text); border-color: var(--border2); }
+  .footer-btn:active { transform: scale(0.94); }
+
+  /* ─── MODALS ─── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 22px 22px 0 0;
+    width: 100%;
+    max-width: 580px;
+    padding: 0 0 env(safe-area-inset-bottom, 12px);
+    transform: translateY(30px);
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    max-height: 92dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-backdrop.open .modal {
+    transform: translateY(0);
+  }
+
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: var(--border2);
+    border-radius: 2px;
+    margin: 12px auto 0;
+    flex-shrink: 0;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    flex-shrink: 0;
+  }
+
+  .modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .modal-close {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--surface3);
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    padding: 11px 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+
+  textarea.form-input {
+    resize: none;
+    min-height: 72px;
+    line-height: 1.5;
+  }
+
+  /* ─── COLOR PICKER ─── */
+  .color-swatches {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+  }
+
+  .color-swatch {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: transform 0.15s, border-color 0.15s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .color-swatch:active { transform: scale(0.88); }
+  .color-swatch.selected { border-color: #fff; transform: scale(1.12); }
+  .color-swatch.selected::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* ─── GROUP INPUT ─── */
+  .group-suggestions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .group-sug {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.12s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .group-sug:active { transform: scale(0.92); }
+  .group-sug:hover { color: var(--text); border-color: var(--border2); }
+
+  /* ─── SUBMIT BTN ─── */
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.4);
+  }
+  .btn-primary:hover { background: #7c74ff; }
+  .btn-primary:active { transform: scale(0.97); }
+
+  /* ─── INFO MODAL ─── */
+  .info-section { margin-bottom: 14px; }
+  .info-section h3 { font-size: 13px; font-weight: 700; color: var(--accent2); margin-bottom: 6px; }
+  .info-section p, .info-section li {
+    font-size: 13px; color: var(--muted); line-height: 1.6;
+  }
+  .info-section ul { padding-left: 16px; }
+  .info-section li { margin-bottom: 3px; }
+
+  .color-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .color-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .cl-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ─── FILTER MODAL ─── */
+  .filter-options { display: flex; flex-direction: column; gap: 8px; }
+  .filter-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 13px;
+    background: var(--surface2);
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .filter-opt.selected { border-color: var(--accent); }
+  .filter-opt-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .filter-opt-label { font-size: 14px; font-weight: 500; flex: 1; }
+  .filter-opt-count {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position: fixed;
+    bottom: calc(var(--footer-h) + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 16px;
+    border-radius: 20px;
+    z-index: 500;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── DESKTOP TWEAK ─── */
+  @media (min-width: 600px) {
+    .modal {
+      border-radius: 22px;
+      margin-bottom: 40px;
+      max-height: 85dvh;
+    }
+    .modal-backdrop {
+      align-items: center;
+    }
+    header { padding: 0 24px; }
+    main { padding: 18px 20px 6px; }
+    footer { padding: 0 24px; }
+    #filter-bar { padding: 10px 20px 6px; }
+  }
+
+  /* ─── SCROLLBAR HIDE ─── */
+  .modal-body::-webkit-scrollbar { width: 3px; }
+  .modal-body::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+  /* ─── DIVIDER ─── */
+  .divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* ─── GITHUB ROW ─── */
+  .github-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+  }
+  .github-row input {
+    flex: 1;
+    min-width: 0;
+  }
+  .github-status {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .github-status.ok { color: var(--pill-green); }
+  .github-status.err { color: var(--pill-red); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <button id="logo-btn" onclick="openModal('info-modal')" aria-label="About Reminders">
+      <div class="logo-icon">📌</div>
+      <span class="logo-text">Reminders</span>
+    </button>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="openFilterModal()" title="Filter" aria-label="Filter reminders">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 3h13M3 7.5h9M5.5 12h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="icon-btn add-btn" onclick="openModal('add-modal')" title="Add reminder" aria-label="Add reminder">+</button>
+    </div>
+  </header>
+
+  <!-- FILTER BAR -->
+  <div id="filter-bar"></div>
+
+  <!-- MAIN -->
+  <main id="main-list">
+    <div id="empty">
+      <div class="em-icon">🗒️</div>
+      <p>No reminders yet.<br>Tap <strong>+</strong> to add your first one.</p>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-stat" id="footer-stat">0 reminders</span>
+    <div class="footer-actions">
+      <button class="footer-btn" onclick="exportData()">⬇ Export</button>
+      <button class="footer-btn" onclick="triggerImport()">⬆ Import</button>
+      <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════ ADD MODAL ══════════════════ -->
+<div class="modal-backdrop" id="add-modal" onclick="backdropClose(event,'add-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">New Reminder</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="icon-btn" style="width:30px;height:30px;font-size:14px;" onclick="openModal('info-modal')" title="How it works" aria-label="App info">ℹ️</button>
+        <button class="modal-close" onclick="closeModal('add-modal')" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <!-- Name -->
+      <div class="form-group">
+        <label>Your name</label>
+        <input class="form-input" id="input-name" type="text" placeholder="e.g. Alex" autocomplete="name" autocorrect="off" autocapitalize="words" spellcheck="false">
+      </div>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label>Reminder</label>
+        <input class="form-input" id="input-title" type="text" placeholder="What do you need to remember?" autocorrect="off">
+      </div>
+
+      <!-- Note -->
+      <div class="form-group">
+        <label>Note (optional)</label>
+        <textarea class="form-input" id="input-note" placeholder="Extra details…" rows="2"></textarea>
+      </div>
+
+      <!-- Group -->
+      <div class="form-group">
+        <label>Group</label>
+        <input class="form-input" id="input-group" type="text" placeholder="e.g. Work, Personal, Health…" autocorrect="off">
+        <div class="group-suggestions" id="group-suggestions"></div>
+      </div>
+
+      <!-- Color / Priority -->
+      <div class="form-group">
+        <label>Colour · Priority</label>
+        <div class="color-swatches" id="color-swatches"></div>
+      </div>
+
+      <button class="btn-primary" onclick="addReminder()">Add Reminder</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ FILTER MODAL ══════════════════ -->
+<div class="modal-backdrop" id="filter-modal" onclick="backdropClose(event,'filter-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Filter by Group</span>
+      <button class="modal-close" onclick="closeModal('filter-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="filter-options" id="filter-options"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ INFO MODAL ══════════════════ -->
+<div class="modal-backdrop" id="info-modal" onclick="backdropClose(event,'info-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">About Reminders</span>
+      <button class="modal-close" onclick="closeModal('info-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-section">
+        <h3>What is this?</h3>
+        <p>Reminders is a lightweight, offline-first reminder app that lives in a single HTML file. No account needed — everything is saved in your browser.</p>
+      </div>
+      <div class="info-section">
+        <h3>Colour · Priority guide</h3>
+        <div class="color-legend" id="info-color-legend"></div>
+      </div>
+      <div class="info-section">
+        <h3>Groups</h3>
+        <p>Assign any reminder to a group (Work, Personal, etc.). Use the filter button <strong>☰</strong> in the header or the quick chips below the header to filter your view.</p>
+      </div>
+      <div class="info-section">
+        <h3>Checking off &amp; deleting</h3>
+        <ul>
+          <li>Tap the circle on a pill to mark it done.</li>
+          <li>Tap the <strong>✕</strong> on a pill to delete it.</li>
+        </ul>
+      </div>
+      <div class="info-section">
+        <h3>Export &amp; Import</h3>
+        <p>Use <strong>⬇ Export</strong> in the footer to save your reminders as a JSON file. Use <strong>⬆ Import</strong> to load them back on any device.</p>
+      </div>
+      <div class="info-section">
+        <h3>GitHub Sync</h3>
+        <p>Enter your GitHub token + repo details in the settings below the add form to read/write reminders directly to a JSON file in a repo. Reminders are merged by ID so no duplicates.</p>
+      </div>
+      <div class="info-section">
+        <h3>Your name</h3>
+        <p>Enter your name once in the add modal — it's saved locally and stamped on every reminder you create, making shared repos easy to track.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ── COLOURS ──────────────────────────────────────────────────
+const COLORS = [
+  { id:'red',    hex:'#ff4d6d', label:'🔴 Critical'  },
+  { id:'orange', hex:'#ff8c42', label:'🟠 High'      },
+  { id:'yellow', hex:'#f7c948', label:'🟡 Medium'    },
+  { id:'green',  hex:'#3dd68c', label:'🟢 Low'       },
+  { id:'blue',   hex:'#4db8ff', label:'🔵 Info'      },
+  { id:'purple', hex:'#a78bfa', label:'🟣 Idea'      },
+  { id:'pink',   hex:'#f472b6', label:'🩷 Personal'  },
+  { id:'teal',   hex:'#2dd4bf', label:'🩵 Ongoing'   },
+];
+
+// ── STATE ─────────────────────────────────────────────────────
+let reminders = JSON.parse(localStorage.getItem('reminders_v2') || '[]');
+let activeFilter = 'all';
+let selectedColor = COLORS[4].id; // default blue
+
+// ── SAVE ──────────────────────────────────────────────────────
+function save() {
+  localStorage.setItem('reminders_v2', JSON.stringify(reminders));
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function getColor(id) {
+  return COLORS.find(c => c.id === id) || COLORS[4];
+}
+
+function render() {
+  const list = document.getElementById('main-list');
+  const empty = document.getElementById('empty');
+
+  // Filter
+  const visible = activeFilter === 'all'
+    ? reminders
+    : reminders.filter(r => (r.group || 'Ungrouped').toLowerCase() === activeFilter.toLowerCase());
+
+  // Clear except empty
+  Array.from(list.children).forEach(c => { if (c.id !== 'empty') c.remove(); });
+
+  if (visible.length === 0) {
+    empty.style.display = 'flex';
+  } else {
+    empty.style.display = 'none';
+    visible.forEach(r => list.appendChild(makePill(r)));
+  }
+
+  // Footer stat
+  const done = reminders.filter(r => r.done).length;
+  document.getElementById('footer-stat').textContent =
+    `${reminders.length} reminder${reminders.length !== 1 ? 's' : ''} · ${done} done`;
+
+  renderFilterBar();
+}
+
+function makePill(r) {
+  const col = getColor(r.color);
+  const pill = document.createElement('div');
+  pill.className = 'reminder-pill' + (r.done ? ' done' : '');
+  pill.style.setProperty('--pill-color', col.hex);
+  pill.dataset.id = r.id;
+
+  pill.innerHTML = `
+    <div class="pill-check" onclick="toggleDone('${r.id}',event)">${r.done ? '✓' : ''}</div>
+    <div class="pill-body">
+      <div class="pill-title">${esc(r.title)}</div>
+      ${r.note ? `<div class="pill-note">${esc(r.note)}</div>` : ''}
+      <div class="pill-meta">
+        ${r.group ? `<span class="pill-tag">${esc(r.group)}</span>` : ''}
+        ${r.author ? `<span class="pill-author">@${esc(r.author)}</span>` : ''}
+        <span class="pill-author" style="opacity:0.5">${col.label.split(' ')[1] || ''}</span>
+      </div>
+    </div>
+    <button class="pill-delete" onclick="deleteReminder('${r.id}',event)" aria-label="Delete">✕</button>
+  `;
+  return pill;
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── FILTER BAR ────────────────────────────────────────────────
+function renderFilterBar() {
+  const bar = document.getElementById('filter-bar');
+  const groups = ['all', ...new Set(reminders.map(r => r.group || 'Ungrouped'))];
+  bar.innerHTML = '';
+  groups.forEach(g => {
+    const chip = document.createElement('button');
+    chip.className = 'filter-chip' + (activeFilter === g ? ' active' : '');
+    chip.textContent = g === 'all' ? 'All' : g;
+    chip.onclick = () => { activeFilter = g; render(); closeModal('filter-modal'); };
+    bar.appendChild(chip);
+  });
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────
+function toggleDone(id, e) {
+  e.stopPropagation();
+  const r = reminders.find(x => x.id === id);
+  if (r) { r.done = !r.done; save(); render(); }
+}
+
+function deleteReminder(id, e) {
+  e.stopPropagation();
+  reminders = reminders.filter(x => x.id !== id);
+  save(); render();
+  toast('Reminder removed');
+}
+
+function addReminder() {
+  const title = document.getElementById('input-title').value.trim();
+  if (!title) { document.getElementById('input-title').focus(); return; }
+
+  const name = document.getElementById('input-name').value.trim();
+  if (name) localStorage.setItem('reminder_name', name);
+
+  const r = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    title,
+    note: document.getElementById('input-note').value.trim(),
+    group: document.getElementById('input-group').value.trim(),
+    color: selectedColor,
+    author: name,
+    done: false,
+    created: Date.now()
+  };
+
+  reminders.unshift(r);
+  save();
+  render();
+  closeModal('add-modal');
+  toast('Reminder added ✓');
+  tryGitHubSync(r);
+}
+
+// ── MODALS ────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'add-modal') populateAddModal();
+  if (id === 'filter-modal') populateFilterModal();
+  if (id === 'info-modal') populateInfoModal();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function backdropClose(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+
+function openFilterModal() {
+  openModal('filter-modal');
+}
+
+// ── ADD MODAL POPULATE ────────────────────────────────────────
+function populateAddModal() {
+  // Name from storage
+  const savedName = localStorage.getItem('reminder_name') || '';
+  document.getElementById('input-name').value = savedName;
+  document.getElementById('input-title').value = '';
+  document.getElementById('input-note').value = '';
+  document.getElementById('input-group').value = '';
+
+  // Swatches
+  const sw = document.getElementById('color-swatches');
+  sw.innerHTML = '';
+  COLORS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'color-swatch' + (c.id === selectedColor ? ' selected' : '');
+    d.style.background = c.hex;
+    d.title = c.label;
+    d.onclick = () => {
+      selectedColor = c.id;
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      d.classList.add('selected');
+    };
+    sw.appendChild(d);
+  });
+
+  // Group suggestions
+  const gs = document.getElementById('group-suggestions');
+  gs.innerHTML = '';
+  const groups = [...new Set(reminders.map(r => r.group).filter(Boolean))].slice(0,8);
+  groups.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'group-sug';
+    btn.textContent = g;
+    btn.onclick = () => document.getElementById('input-group').value = g;
+    gs.appendChild(btn);
+  });
+
+  setTimeout(() => document.getElementById('input-title').focus(), 300);
+}
+
+// ── FILTER MODAL POPULATE ─────────────────────────────────────
+function populateFilterModal() {
+  const opts = document.getElementById('filter-options');
+  opts.innerHTML = '';
+  const groups = ['all', ...new Set(reminders.map(r => r.group || 'Ungrouped'))];
+  groups.forEach(g => {
+    const count = g === 'all' ? reminders.length : reminders.filter(r => (r.group||'Ungrouped') === g).length;
+    const d = document.createElement('div');
+    d.className = 'filter-opt' + (activeFilter === g ? ' selected' : '');
+    const dotCol = g === 'all' ? '#6c63ff' : '#' + Math.abs(hashStr(g)).toString(16).padStart(6,'0').slice(0,6);
+    d.innerHTML = `
+      <div class="filter-opt-dot" style="background:${dotCol}"></div>
+      <span class="filter-opt-label">${g === 'all' ? 'All Reminders' : g}</span>
+      <span class="filter-opt-count">${count}</span>
+    `;
+    d.onclick = () => { activeFilter = g; render(); closeModal('filter-modal'); };
+    opts.appendChild(d);
+  });
+}
+
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  return h;
+}
+
+// ── INFO MODAL POPULATE ───────────────────────────────────────
+function populateInfoModal() {
+  const leg = document.getElementById('info-color-legend');
+  leg.innerHTML = COLORS.map(c => `
+    <div class="color-legend-item">
+      <div class="cl-dot" style="background:${c.hex}"></div>
+      <span>${c.label}</span>
+    </div>
+  `).join('');
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify(reminders, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `reminders-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('Exported ✓');
+}
+
+function triggerImport() {
+  document.getElementById('import-input').click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!Array.isArray(imported)) throw new Error();
+      // Merge by id
+      const existingIds = new Set(reminders.map(r => r.id));
+      const newOnes = imported.filter(r => !existingIds.has(r.id));
+      reminders = [...reminders, ...newOnes];
+      save(); render();
+      toast(`Imported ${newOnes.length} new reminder${newOnes.length !== 1 ? 's' : ''} ✓`);
+    } catch { toast('Invalid file ✕'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ── GITHUB SYNC (optional) ────────────────────────────────────
+// Users can set these in localStorage manually or via a settings UI
+// localStorage.setItem('gh_token', '...');
+// localStorage.setItem('gh_repo', 'owner/repo');
+// localStorage.setItem('gh_path', 'reminders.json');
+// localStorage.setItem('gh_branch', 'main');
+
+async function tryGitHubSync(newReminder) {
+  const token  = localStorage.getItem('gh_token');
+  const repo   = localStorage.getItem('gh_repo');
+  const path   = localStorage.getItem('gh_path') || 'reminders.json';
+  const branch = localStorage.getItem('gh_branch') || 'main';
+  if (!token || !repo) return;
+
+  try {
+    const apiBase = `https://api.github.com/repos/${repo}/contents/${path}`;
+    // Get current file
+    let sha = null;
+    let existing = [];
+    const get = await fetch(apiBase + `?ref=${branch}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (get.ok) {
+      const data = await get.json();
+      sha = data.sha;
+      existing = JSON.parse(atob(data.content.replace(/\n/g,'')));
+    }
+    // Merge
+    const idSet = new Set(existing.map(r => r.id));
+    if (!idSet.has(newReminder.id)) existing.unshift(newReminder);
+
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(existing, null, 2))));
+    const body = { message: `Add reminder by ${newReminder.author || 'user'}`, content, branch };
+    if (sha) body.sha = sha;
+
+    await fetch(apiBase, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    toast('Synced to GitHub ✓');
+  } catch(err) {
+    console.warn('GitHub sync failed:', err);
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['add-modal','filter-modal','info-modal'].forEach(closeModal);
+  }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault(); openModal('add-modal');
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
 
