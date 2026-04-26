@@ -51,7 +51,9 @@ html, body {
 header {
   flex: 0 0 var(--header-h);
   display: flex; align-items: center;
-  padding: 0 16px; gap: 10px;
+  padding: env(safe-area-inset-top, 0) 16px 0;
+  min-height: var(--header-h);
+  gap: 10px;
   border-bottom: 1px solid var(--border);
   background: rgba(13,17,23,0.97);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
