@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 
 :root {
   --bg:      #0d1117;
@@ -78,20 +78,17 @@ header {
 
 .header-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
 
-/* filtered badge */
 #filter-badge {
   font-size:10px; font-weight:700;
   font-family:'JetBrains Mono',monospace;
   color:var(--accent); background:rgba(0,200,212,0.12);
   border:1.5px solid rgba(0,200,212,0.35);
-  border-radius:50px; padding:3px 9px;
-  display:none; cursor:pointer;
-  transition:all 0.15s;
+  border-radius:50px; padding:4px 10px;
+  display:none; cursor:pointer; transition:all 0.15s;
 }
 #filter-badge.visible { display:inline-block; }
 #filter-badge:hover { background:rgba(0,200,212,0.22); }
 
-/* pill buttons */
 .pill-btn {
   display:flex; align-items:center; gap:6px;
   padding:8px 16px; border-radius:50px;
@@ -99,8 +96,7 @@ header {
   background:var(--surface2);
   color:var(--muted); font-size:13px; font-weight:600;
   font-family:'Sora',sans-serif;
-  cursor:pointer; transition:all 0.15s;
-  white-space:nowrap;
+  cursor:pointer; transition:all 0.15s; white-space:nowrap;
 }
 .pill-btn:active { transform:scale(0.93); }
 .pill-btn:hover  { border-color:var(--accent); color:var(--text); }
@@ -110,16 +106,6 @@ header {
   box-shadow:0 0 16px rgba(0,200,212,0.35);
 }
 .pill-btn.primary:hover { background:var(--accent2); border-color:var(--accent2); }
-
-/* ── FILTER BAR ── */
-#filter-bar {
-  flex:0 0 auto; padding:10px 14px 8px;
-  display:flex; gap:7px;
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
-  scrollbar-width:none; border-bottom:1px solid var(--border);
-  min-height:46px;
-}
-#filter-bar::-webkit-scrollbar { display:none; }
 
 /* ── MAIN ── */
 main {
@@ -131,7 +117,7 @@ main {
 main::-webkit-scrollbar { width:3px; }
 main::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
 
-/* group card */
+/* ── GROUP CARD ── */
 .group-card {
   background:var(--surface);
   border:1px solid var(--border2);
@@ -140,11 +126,12 @@ main::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
   overflow:hidden;
 }
 .group-card-header {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:12px 15px 10px;
+  display:flex; align-items:center;
+  padding:11px 12px 10px;
   border-bottom:1px solid var(--border);
+  gap:8px;
 }
-.group-card-title { font-size:15px; font-weight:700; color:var(--text); }
+.group-card-title { font-size:15px; font-weight:700; color:var(--text); flex:1; }
 .group-card-badge {
   font-size:10px; font-weight:700;
   padding:3px 9px; border-radius:20px;
@@ -152,17 +139,27 @@ main::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
   font-family:'JetBrains Mono',monospace;
   text-transform:uppercase; letter-spacing:0.5px;
 }
+.group-add-btn {
+  width:28px; height:28px; border-radius:50%;
+  background:var(--surface3); border:1.5px solid var(--border2);
+  color:var(--accent); font-size:18px; font-weight:300;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.15s; flex-shrink:0;
+  line-height:1;
+}
+.group-add-btn:hover  { background:var(--accent); color:#0d1117; border-color:var(--accent); }
+.group-add-btn:active { transform:scale(0.88); }
+
 .group-pills { padding:8px 10px 10px; display:flex; flex-direction:column; gap:7px; }
-.group-card.ungrouped .group-card-header { display:none; }
-.group-card.ungrouped { background:transparent; border-color:transparent; }
-.group-card.ungrouped .group-pills { padding:0 0 12px; }
+.group-card.general-card { background:transparent; border-color:transparent; }
+.group-card.general-card .group-card-header { display:none; }
+.group-card.general-card .group-pills { padding:0 0 12px; }
 
 /* ── REMINDER PILL ── */
 .reminder-pill {
   display:flex; align-items:center; gap:10px;
   padding:10px 12px; border-radius:50px;
   background:var(--surface2); border:1.5px solid var(--border2);
-  position:relative;
   animation:slideIn 0.18s ease;
   transition:opacity 0.25s;
 }
@@ -171,10 +168,7 @@ main::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
 .reminder-pill.done { opacity:0.35; }
 .reminder-pill.done .pill-title { text-decoration:line-through; }
 
-.pill-dot {
-  width:10px; height:10px; border-radius:50%;
-  flex-shrink:0;
-}
+.pill-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 .pill-check {
   width:24px; height:24px; border-radius:50%;
   border:2px solid var(--pill-color, var(--accent));
@@ -187,14 +181,13 @@ main::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
 .reminder-pill.done .pill-check { background:var(--pill-color); color:#fff; }
 
 .pill-body { flex:1; min-width:0; }
-.pill-title { font-size:13px; font-weight:600; line-height:1.3; }
-.pill-note  { font-size:11px; color:var(--muted); line-height:1.4; margin-top:2px; }
+.pill-title  { font-size:13px; font-weight:600; line-height:1.3; }
+.pill-note   { font-size:11px; color:var(--muted); line-height:1.4; margin-top:2px; }
 .pill-author { font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:2px; }
 
 .pill-delete {
-  background:none; border:none;
-  color:var(--red); cursor:pointer;
-  font-size:17px; line-height:1;
+  background:none; border:none; color:var(--red);
+  cursor:pointer; font-size:17px; line-height:1;
   padding:3px 5px; border-radius:50%;
   transition:opacity 0.2s, background 0.15s;
   flex-shrink:0; opacity:0; pointer-events:none;
@@ -238,7 +231,6 @@ footer {
   opacity:0; pointer-events:none; transition:opacity 0.2s;
 }
 .modal-backdrop.open { opacity:1; pointer-events:all; }
-
 .modal {
   background:var(--surface); border:1px solid var(--border2);
   border-radius:24px 24px 0 0;
@@ -249,11 +241,7 @@ footer {
   max-height:92dvh; display:flex; flex-direction:column;
 }
 .modal-backdrop.open .modal { transform:translateY(0); }
-
-.modal-handle {
-  width:38px; height:4px; background:var(--border2);
-  border-radius:2px; margin:12px auto 0; flex-shrink:0;
-}
+.modal-handle { width:38px; height:4px; background:var(--border2); border-radius:2px; margin:12px auto 0; flex-shrink:0; }
 .modal-header {
   display:flex; align-items:center; justify-content:space-between;
   padding:15px 18px 12px; flex-shrink:0;
@@ -266,11 +254,9 @@ footer {
   display:flex; align-items:center; justify-content:center;
 }
 .modal-close:hover { color:var(--text); }
-
 .modal-body {
   flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:0 18px 18px;
-  display:flex; flex-direction:column; gap:16px;
+  padding:0 18px 18px; display:flex; flex-direction:column; gap:16px;
 }
 .modal-body::-webkit-scrollbar { width:3px; }
 .modal-body::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
@@ -291,39 +277,39 @@ footer {
   -webkit-appearance:none; appearance:none;
 }
 .form-input:focus { border-color:var(--accent); }
-textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
-
-/* error state */
 .form-input.error { border-color:var(--red); }
+textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
 .form-error { font-size:11px; color:var(--red); margin-top:5px; display:none; }
 .form-error.show { display:block; }
 
-/* ── MODE TOGGLE (filter in/out) ── */
+/* ── MODE TOGGLE ── */
 .mode-toggle {
   display:flex; background:var(--surface2);
-  border-radius:50px; padding:3px; gap:3px;
+  border-radius:16px; padding:4px; gap:4px;
   border:1.5px solid var(--border2);
 }
 .mode-btn {
-  flex:1; padding:8px 12px; border-radius:50px;
+  flex:1; padding:10px 8px; border-radius:12px;
   border:none; background:transparent;
-  color:var(--muted); font-size:13px; font-weight:600;
-  font-family:'Sora',sans-serif; cursor:pointer;
-  transition:all 0.15s; white-space:nowrap;
+  color:var(--muted); font-family:'Sora',sans-serif;
+  cursor:pointer; transition:all 0.15s;
+  text-align:center; line-height:1.3;
 }
-.mode-btn.active {
-  background:var(--surface3);
-  color:var(--text);
+.mode-btn .mode-title {
+  font-size:13px; font-weight:700; display:block;
 }
+.mode-btn .mode-sub {
+  font-size:10px; font-weight:500; display:block; margin-top:2px; opacity:0.7;
+}
+.mode-btn.active { background:var(--surface3); }
 .mode-btn.active.out { color:var(--red); }
 .mode-btn.active.in  { color:var(--green); }
 
-/* ── FILTER SECTION ── */
+/* ── FILTER OPTIONS ── */
 .filter-section-label {
   font-size:10px; font-weight:700; text-transform:uppercase;
   letter-spacing:1px; color:var(--muted);
-  font-family:'JetBrains Mono',monospace;
-  padding:4px 0 8px;
+  font-family:'JetBrains Mono',monospace; padding:4px 0 8px;
 }
 .filter-opt {
   display:flex; align-items:center; gap:12px;
@@ -332,7 +318,7 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
   border:1.5px solid var(--border2); transition:all 0.15s;
   margin-bottom:7px; user-select:none;
 }
-.filter-opt.selected-out { border-color:var(--red); background:rgba(255,77,109,0.07); }
+.filter-opt.selected-out { border-color:var(--red);   background:rgba(255,77,109,0.07); }
 .filter-opt.selected-in  { border-color:var(--green); background:rgba(61,214,140,0.07); }
 .filter-opt-dot  { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
 .filter-opt-name { font-size:14px; font-weight:600; flex:1; }
@@ -341,16 +327,13 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
   width:20px; height:20px; border-radius:50%;
   border:2px solid var(--border2);
   display:flex; align-items:center; justify-content:center;
-  font-size:10px; font-weight:700; flex-shrink:0;
-  transition:all 0.15s;
+  font-size:10px; font-weight:700; flex-shrink:0; transition:all 0.15s;
 }
-.filter-opt.selected-out .filter-opt-check { border-color:var(--red); background:var(--red); color:#fff; }
+.filter-opt.selected-out .filter-opt-check { border-color:var(--red);   background:var(--red);   color:#fff; }
 .filter-opt.selected-in  .filter-opt-check { border-color:var(--green); background:var(--green); color:#fff; }
 
 /* ── GROUP PILL SELECTOR ── */
-.group-pill-row {
-  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
-}
+.group-pill-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
 .group-pill-sel {
   padding:7px 14px; border-radius:50px;
   border:1.5px solid var(--border2); background:var(--surface2);
@@ -359,42 +342,30 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
   transition:all 0.15s; white-space:nowrap;
 }
 .group-pill-sel:active { transform:scale(0.93); }
-.group-pill-sel.active {
-  background:rgba(0,200,212,0.15);
-  border-color:var(--accent); color:var(--accent);
-}
-.group-pill-sel.add-group-btn {
-  border-style:dashed; color:var(--muted);
-  display:flex; align-items:center; gap:5px;
-}
+.group-pill-sel.active { background:rgba(0,200,212,0.15); border-color:var(--accent); color:var(--accent); }
+.group-pill-sel.add-group-btn { border-style:dashed; }
 .group-pill-sel.add-group-btn:hover { border-color:var(--accent); color:var(--accent); }
-
-.add-group-inline {
-  display:none; align-items:center; gap:8px;
-  width:100%; margin-top:4px;
-}
+.add-group-inline { display:none; align-items:center; gap:8px; width:100%; margin-top:4px; }
 .add-group-inline.show { display:flex; }
 .add-group-inline input {
   flex:1; background:var(--surface2);
   border:1.5px solid var(--accent); border-radius:10px;
   color:var(--text); font-family:'Sora',sans-serif;
-  font-size:13px; padding:8px 12px; outline:none;
-  -webkit-appearance:none;
+  font-size:13px; padding:8px 12px; outline:none; -webkit-appearance:none;
 }
 .add-group-inline button {
   padding:8px 14px; border-radius:50px;
   background:var(--accent); border:none;
   color:#0d1117; font-size:12px; font-weight:700;
-  font-family:'Sora',sans-serif; cursor:pointer;
-  white-space:nowrap;
+  font-family:'Sora',sans-serif; cursor:pointer; white-space:nowrap;
 }
 
-/* ── COLOUR PICKER ── */
+/* ── COLOUR SWATCHES ── */
 .color-swatches { display:flex; gap:10px; }
 .color-swatch {
   flex:1; padding:10px 6px; border-radius:12px;
   cursor:pointer; border:2px solid transparent;
-  transition:all 0.15s; position:relative;
+  transition:all 0.15s;
   display:flex; flex-direction:column; align-items:center; gap:5px;
 }
 .color-swatch:active { transform:scale(0.94); }
@@ -404,23 +375,20 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
 .color-swatch[data-color="red"].selected    { border-color:var(--red); }
 .color-swatch[data-color="yellow"].selected { border-color:var(--yellow); }
 .color-swatch[data-color="green"].selected  { border-color:var(--green); }
-.swatch-dot {
-  width:20px; height:20px; border-radius:50%;
-}
+.swatch-dot { width:20px; height:20px; border-radius:50%; }
 .swatch-label { font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; letter-spacing:0.3px; }
 
 /* ── IMPORT TOGGLE ── */
 .import-mode-toggle {
   display:flex; background:var(--surface2);
   border-radius:50px; padding:3px; gap:3px;
-  border:1.5px solid var(--border2); margin-bottom:4px;
+  border:1.5px solid var(--border2);
 }
 .import-mode-btn {
   flex:1; padding:8px 12px; border-radius:50px;
   border:none; background:transparent;
   color:var(--muted); font-size:13px; font-weight:600;
-  font-family:'Sora',sans-serif; cursor:pointer;
-  transition:all 0.15s;
+  font-family:'Sora',sans-serif; cursor:pointer; transition:all 0.15s;
 }
 .import-mode-btn.active { background:var(--surface3); color:var(--text); }
 
@@ -431,20 +399,17 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
   color:#0d1117; font-family:'Sora',sans-serif;
   font-size:15px; font-weight:800;
   cursor:pointer; transition:background 0.15s, transform 0.1s;
-  box-shadow:0 4px 20px rgba(0,200,212,0.35);
-  letter-spacing:0.3px;
+  box-shadow:0 4px 20px rgba(0,200,212,0.35); letter-spacing:0.3px;
 }
 .btn-primary:hover  { background:var(--accent2); }
 .btn-primary:active { transform:scale(0.97); }
-
 .btn-danger {
   width:100%; padding:14px;
-  background:rgba(255,77,109,0.15); border:1.5px solid var(--red); border-radius:50px;
+  background:rgba(255,77,109,0.12); border:1.5px solid var(--red); border-radius:50px;
   color:var(--red); font-family:'Sora',sans-serif;
-  font-size:15px; font-weight:800;
-  cursor:pointer; transition:all 0.15s;
+  font-size:15px; font-weight:800; cursor:pointer; transition:all 0.15s;
 }
-.btn-danger:hover  { background:rgba(255,77,109,0.25); }
+.btn-danger:hover  { background:rgba(255,77,109,0.22); }
 .btn-danger:active { transform:scale(0.97); }
 
 /* ── INFO ── */
@@ -465,8 +430,7 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
   background:var(--surface3); border:1.5px solid var(--border2);
   color:var(--text); font-size:13px; font-weight:600;
   padding:10px 18px; border-radius:50px;
-  z-index:500; opacity:0;
-  transition:opacity 0.2s, transform 0.2s;
+  z-index:500; opacity:0; transition:opacity 0.2s, transform 0.2s;
   pointer-events:none; white-space:nowrap;
 }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
@@ -475,9 +439,8 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
 @media (min-width:600px) {
   .modal { border-radius:24px; margin-bottom:40px; max-height:86dvh; }
   .modal-backdrop { align-items:center; }
-  header, footer { padding:0 24px; }
+  header, footer { padding-left:24px; padding-right:24px; }
   main { padding:16px 20px 6px; }
-  #filter-bar { padding:10px 20px 8px; }
 }
 </style>
 </head>
@@ -497,11 +460,9 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
         </svg>
         Filter
       </button>
-      <button class="pill-btn primary" onclick="openModal('add-modal')">+ Add</button>
+      <button class="pill-btn primary" onclick="openAddModal(null)">+ Add</button>
     </div>
   </header>
-
-  <div id="filter-bar"></div>
 
   <main id="main-list">
     <div id="empty">
@@ -531,28 +492,20 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
       </div>
     </div>
     <div class="modal-body">
-
-      <!-- Who is this for -->
       <div class="form-group">
         <label>Who is this for? *</label>
         <input class="form-input" id="input-name" type="text" placeholder="Your name" autocorrect="off" autocapitalize="words" spellcheck="false">
         <div class="form-error" id="name-error">Name is required</div>
       </div>
-
-      <!-- Reminder -->
       <div class="form-group">
         <label>Reminder *</label>
         <input class="form-input" id="input-title" type="text" placeholder="What do you need to remember?" autocorrect="off">
         <div class="form-error" id="title-error">Reminder text is required</div>
       </div>
-
-      <!-- Note -->
       <div class="form-group">
         <label>Note <span style="font-weight:400;opacity:0.5;text-transform:none;letter-spacing:0">(optional)</span></label>
         <textarea class="form-input" id="input-note" placeholder="Extra details…" rows="2"></textarea>
       </div>
-
-      <!-- Group -->
       <div class="form-group">
         <label>Group</label>
         <div class="group-pill-row" id="group-pill-row"></div>
@@ -562,13 +515,10 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
           <button onclick="confirmNewGroup()">Add</button>
         </div>
       </div>
-
-      <!-- Priority -->
       <div class="form-group">
         <label>Priority</label>
         <div class="color-swatches" id="color-swatches"></div>
       </div>
-
       <button class="btn-primary" onclick="addReminder()">+ Add Reminder</button>
     </div>
   </div>
@@ -640,7 +590,7 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
             <span class="cl-label" style="color:var(--green)">LOW</span>
           </div>
         </div>
-        <p style="margin-top:10px">Red sorts to top, green to bottom. Done items sink to the bottom — tap ✕ to clear, or tap circle again to restore.</p>
+        <p style="margin-top:10px">Red sorts to top, green to bottom. Done items sink — tap ✕ to clear, or tap circle again to restore.</p>
       </div>
       <div class="info-section">
         <h3>Filtering</h3>
@@ -648,12 +598,12 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
           <li><strong>Filter Out</strong> — everything shown, select items to hide.</li>
           <li><strong>Filter In</strong> — nothing shown, select items to show.</li>
           <li>People and groups work as an AND condition.</li>
-          <li>Tap <strong>Filtered ✕</strong> in the header to clear.</li>
+          <li>Tap <strong>Filtered ✕</strong> in the header to clear instantly.</li>
         </ul>
       </div>
       <div class="info-section">
         <h3>Groups</h3>
-        <p>General is always the default. Add custom groups in the add modal — they persist across sessions.</p>
+        <p>General is always the default. Add custom groups in the add modal — they persist across sessions. Tap the <strong>+</strong> on any group card to quickly add to that group.</p>
       </div>
       <div class="info-section">
         <h3>Export / Import</h3>
@@ -666,7 +616,7 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
 <div id="toast"></div>
 
 <script>
-// ── COLOURS ──────────────────────────────────────────────────
+// ── COLOURS ───────────────────────────────────────────────────
 const COLORS = [
   {id:'red',    hex:'#ff4d6d', label:'Urgent', order:0},
   {id:'yellow', hex:'#f7c948', label:'Medium', order:1},
@@ -675,49 +625,45 @@ const COLORS = [
 function getColor(id) { return COLORS.find(c=>c.id===id)||COLORS[2]; }
 
 // ── STATE ─────────────────────────────────────────────────────
-let reminders    = safeJSON('reminders_v4', []);
+let reminders    = safeJSON('reminders', []);
 let groups       = safeJSON('reminder_groups', ['General']);
-// Ensure General is always first
 if (!groups.includes('General')) groups.unshift('General');
 
-// activeFilter: { mode:'out'|'in', people:[], groups:[] }
-let activeFilter = safeJSON('reminder_filter_v2', {mode:'out', people:[], groups:[]});
+let activeFilter = safeJSON('reminder_filter', {mode:'out', people:[], groups:[]});
 let selectedColor = 'green';
-let selectedGroup = 'General';
+let selectedGroup = 'General';   // always resets to General on open
 let importMode    = 'merge';
 let myName        = localStorage.getItem('reminder_name') || '';
 
-function safeJSON(k,fb){ try{const v=JSON.parse(localStorage.getItem(k)); return v!==null?v:fb;}catch(e){return fb;} }
-function save()        { localStorage.setItem('reminders_v4', JSON.stringify(reminders)); }
-function saveGroups()  { localStorage.setItem('reminder_groups', JSON.stringify(groups)); }
-function saveFilter()  { localStorage.setItem('reminder_filter_v2', JSON.stringify(activeFilter)); }
+// tmp filter state while modal open
+let tmpFilter = {mode:'out', people:[], groups:[]};
 
-// ── FILTER LOGIC ──────────────────────────────────────────────
+function safeJSON(k,fb){ try{const v=JSON.parse(localStorage.getItem(k)); return v!==null?v:fb;}catch(e){return fb;} }
+function save()       { localStorage.setItem('reminders', JSON.stringify(reminders)); }
+function saveGroups() { localStorage.setItem('reminder_groups', JSON.stringify(groups)); }
+function saveFilter() { localStorage.setItem('reminder_filter', JSON.stringify(activeFilter)); }
+
+// ── FILTER ────────────────────────────────────────────────────
 function isFiltered() {
   return activeFilter.people.length > 0 || activeFilter.groups.length > 0;
 }
 
 function passesFilter(r) {
-  const {mode, people, groups: fg} = activeFilter;
   if (!isFiltered()) return true;
-
-  const personMatch = people.length === 0 || people.includes(r.author||'');
-  const groupMatch  = fg.length === 0     || fg.includes(r.group||'General');
-
-  // AND condition: both must match if both are set
+  const {mode, people, groups:fg} = activeFilter;
+  const personMatch = people.length===0 || people.includes(r.author||'');
+  const groupMatch  = fg.length===0     || fg.includes(r.group||'General');
   let selected;
-  if (people.length > 0 && fg.length > 0) selected = personMatch && groupMatch;
-  else if (people.length > 0) selected = personMatch;
+  if (people.length>0 && fg.length>0) selected = personMatch && groupMatch;
+  else if (people.length>0) selected = personMatch;
   else selected = groupMatch;
-
-  return mode === 'out' ? !selected : selected;
+  return mode==='out' ? !selected : selected;
 }
 
 function clearFilter() {
   activeFilter.people = [];
   activeFilter.groups = [];
-  saveFilter();
-  render();
+  saveFilter(); render();
 }
 
 // ── SORT ──────────────────────────────────────────────────────
@@ -742,7 +688,7 @@ function render() {
   if (vis.length > 0) {
     const grouped = {};
     vis.forEach(r => {
-      const g = r.group || 'General';
+      const g = r.group||'General';
       if (!grouped[g]) grouped[g] = [];
       grouped[g].push(r);
     });
@@ -755,10 +701,20 @@ function render() {
 
     keys.forEach(g => {
       const card = document.createElement('div');
-      card.className = 'group-card' + (g==='General'?' ungrouped':'');
+      card.className = 'group-card'+(g==='General'?' general-card':'');
+
       if (g !== 'General') {
-        card.innerHTML = `<div class="group-card-header"><span class="group-card-title">${esc(g)}</span><span class="group-card-badge">${grouped[g].length}</span></div>`;
+        const hdr = document.createElement('div');
+        hdr.className = 'group-card-header';
+        hdr.innerHTML = `
+          <span class="group-card-title">${esc(g)}</span>
+          <span class="group-card-badge">${grouped[g].length}</span>
+          <button class="group-add-btn" title="Add to ${esc(g)}">+</button>
+        `;
+        hdr.querySelector('.group-add-btn').onclick = () => openAddModal(g);
+        card.appendChild(hdr);
       }
+
       const wrap = document.createElement('div');
       wrap.className = 'group-pills';
       grouped[g].forEach(r => wrap.appendChild(makePill(r)));
@@ -771,11 +727,7 @@ function render() {
   document.getElementById('footer-stat').textContent =
     `${reminders.length} reminder${reminders.length!==1?'s':''} · ${done} done`;
 
-  // Filter badge
-  const badge = document.getElementById('filter-badge');
-  badge.classList.toggle('visible', isFiltered());
-
-  renderFilterBar();
+  document.getElementById('filter-badge').classList.toggle('visible', isFiltered());
 }
 
 function makePill(r) {
@@ -789,8 +741,8 @@ function makePill(r) {
     <div class="pill-check" onclick="toggleDone('${r.id}',event)">${r.done?'✓':''}</div>
     <div class="pill-body">
       <div class="pill-title">${esc(r.title)}</div>
-      ${r.note?`<div class="pill-note">${esc(r.note)}</div>`:''}
-      ${r.author?`<div class="pill-author">@${esc(r.author)}</div>`:''}
+      ${r.note   ?`<div class="pill-note">${esc(r.note)}</div>`:''}
+      ${r.author ?`<div class="pill-author">@${esc(r.author)}</div>`:''}
     </div>
     <button class="pill-delete" onclick="deleteReminder('${r.id}',event)" aria-label="Delete">✕</button>
   `;
@@ -799,166 +751,24 @@ function makePill(r) {
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ── FILTER BAR ── (shows active filter summary) ───────────────
-function renderFilterBar() {
-  const bar = document.getElementById('filter-bar');
-  bar.innerHTML = '';
-  if (!isFiltered()) {
-    // Show group chips passively
-    addChip(bar, 'All', true, ()=>{});
-    groups.forEach(g => {
-      addChip(bar, g, false, ()=>{
-        activeFilter = {mode:'in', people:[], groups:[g]};
-        saveFilter(); render();
-      });
-    });
-  } else {
-    const {mode, people, grps=activeFilter.groups} = {mode:activeFilter.mode, people:activeFilter.people, grps:activeFilter.groups};
-    addChip(bar, mode==='out'?'Filter Out':'Filter In', true, ()=>{});
-    people.forEach(p => addChip(bar, `@${p}`, true, ()=>{}));
-    grps.forEach(g  => addChip(bar, g, true, ()=>{}));
-  }
-}
-
-function addChip(parent, label, active, onclick) {
-  const c = document.createElement('button');
-  c.className = 'filter-chip'+(active?' active':'');
-  c.textContent = label; c.onclick = onclick;
-  parent.appendChild(c);
-}
-
-// ── FILTER MODAL ──────────────────────────────────────────────
-// Temporary state while modal is open
-let tmpFilter = {mode:'out', people:[], groups:[]};
-
-function populateFilterModal() {
-  tmpFilter = {
-    mode:   activeFilter.mode,
-    people: [...activeFilter.people],
-    groups: [...activeFilter.groups],
-  };
-
-  const body = document.getElementById('filter-modal-body');
-  body.innerHTML = '';
-
-  // Mode toggle
-  const modeDiv = document.createElement('div');
-  modeDiv.className = 'form-group';
-  modeDiv.innerHTML = `
-    <label>Mode</label>
-    <div class="mode-toggle">
-      <button class="mode-btn out ${tmpFilter.mode==='out'?'active':''}" id="fmode-out" onclick="setTmpMode('out')">Filter Out — hide selected</button>
-      <button class="mode-btn in  ${tmpFilter.mode==='in' ?'active':''}" id="fmode-in"  onclick="setTmpMode('in')">Filter In — show selected</button>
-    </div>
-  `;
-  body.appendChild(modeDiv);
-
-  // People section
-  const people = [...new Set(reminders.map(r=>r.author).filter(Boolean))];
-  if (people.length > 0) {
-    const lbl = document.createElement('div');
-    lbl.className = 'filter-section-label'; lbl.textContent = 'People';
-    body.appendChild(lbl);
-    people.forEach(p => {
-      const cnt = reminders.filter(r=>r.author===p).length;
-      body.appendChild(makeFilterOpt('person', p, p, cnt, personColor(p)));
-    });
-  }
-
-  // Groups section
-  const lbl2 = document.createElement('div');
-  lbl2.className = 'filter-section-label'; lbl2.style.marginTop = '8px';
-  lbl2.textContent = 'Groups';
-  body.appendChild(lbl2);
-  groups.forEach(g => {
-    const cnt = reminders.filter(r=>(r.group||'General')===g).length;
-    body.appendChild(makeFilterOpt('group', g, g, cnt, groupColor(g)));
-  });
-
-  // Clear + Apply
-  const actions = document.createElement('div');
-  actions.style.cssText = 'display:flex;gap:10px;margin-top:4px';
-  actions.innerHTML = `
-    <button class="btn-danger" style="flex:1;padding:12px;font-size:13px" onclick="clearFilter();closeModal('filter-modal')">Clear</button>
-    <button class="btn-primary" style="flex:2;padding:12px;font-size:13px" onclick="applyFilter()">Apply</button>
-  `;
-  body.appendChild(actions);
-}
-
-function makeFilterOpt(type, key, label, count, color) {
-  const list = type==='person' ? tmpFilter.people : tmpFilter.groups;
-  const sel  = list.includes(key);
-  const d    = document.createElement('div');
-  d.className = 'filter-opt' + (sel ? (tmpFilter.mode==='out'?' selected-out':' selected-in') : '');
-  d.id = `fopt-${type}-${key}`;
-  d.innerHTML = `
-    <div class="filter-opt-dot" style="background:${color}"></div>
-    <span class="filter-opt-name">${esc(label)}</span>
-    <span class="filter-opt-cnt">${count}</span>
-    <div class="filter-opt-check">${sel?'✓':''}</div>
-  `;
-  d.onclick = () => toggleFilterOpt(type, key, d);
-  return d;
-}
-
-function toggleFilterOpt(type, key, el) {
-  const list = type==='person' ? tmpFilter.people : tmpFilter.groups;
-  const idx  = list.indexOf(key);
-  if (idx >= 0) list.splice(idx,1);
-  else list.push(key);
-  const sel = list.includes(key);
-  el.className = 'filter-opt' + (sel ? (tmpFilter.mode==='out'?' selected-out':' selected-in') : '');
-  el.querySelector('.filter-opt-check').textContent = sel ? '✓' : '';
-}
-
-function setTmpMode(mode) {
-  tmpFilter.mode = mode;
-  document.getElementById('fmode-out').className = `mode-btn out ${mode==='out'?'active':''}`;
-  document.getElementById('fmode-in').className  = `mode-btn in  ${mode==='in' ?'active':''}`;
-  // Update all opt classes
-  document.querySelectorAll('.filter-opt').forEach(el => {
-    if (el.classList.contains('selected-out') || el.classList.contains('selected-in')) {
-      el.classList.remove('selected-out','selected-in');
-      el.classList.add(mode==='out'?'selected-out':'selected-in');
-    }
-  });
-}
-
-function applyFilter() {
-  activeFilter = {...tmpFilter};
-  saveFilter(); render(); closeModal('filter-modal');
-}
-
 // ── ADD MODAL ─────────────────────────────────────────────────
+function openAddModal(presetGroup) {
+  selectedGroup = 'General'; // always default to General
+  if (presetGroup && groups.includes(presetGroup)) selectedGroup = presetGroup;
+  openModal('add-modal');
+}
+
 function populateAddModal() {
   document.getElementById('input-name').value  = myName;
   document.getElementById('input-title').value = '';
   document.getElementById('input-note').value  = '';
-  document.getElementById('input-name').classList.remove('error');
-  document.getElementById('input-title').classList.remove('error');
-  document.getElementById('name-error').classList.remove('show');
-  document.getElementById('title-error').classList.remove('show');
+  ['input-name','input-title'].forEach(id=>document.getElementById(id).classList.remove('error'));
+  ['name-error','title-error'].forEach(id=>document.getElementById(id).classList.remove('show'));
   document.getElementById('add-group-inline').classList.remove('show');
   document.getElementById('new-group-input').value = '';
 
-  // Group pills
   renderGroupPills();
-
-  // Colour swatches
-  const sw = document.getElementById('color-swatches');
-  sw.innerHTML = '';
-  COLORS.forEach(c => {
-    const d = document.createElement('div');
-    d.className = 'color-swatch'+(c.id===selectedColor?' selected':'');
-    d.dataset.color = c.id; d.title = c.label;
-    d.innerHTML = `<div class="swatch-dot" style="background:${c.hex};box-shadow:0 0 10px ${c.hex}80"></div><span class="swatch-label" style="color:${c.hex}">${c.label.toUpperCase()}</span>`;
-    d.onclick = () => {
-      selectedColor = c.id;
-      document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
-      d.classList.add('selected');
-    };
-    sw.appendChild(d);
-  });
+  renderColorSwatches();
 
   setTimeout(()=>document.getElementById('input-title').focus(), 320);
 }
@@ -977,18 +787,32 @@ function renderGroupPills() {
     };
     row.appendChild(p);
   });
-  // Add group button
-  const add = document.createElement('button');
-  add.className = 'group-pill-sel add-group-btn';
-  add.innerHTML = '+ Add Group';
-  add.onclick = () => {
+  const addBtn = document.createElement('button');
+  addBtn.className = 'group-pill-sel add-group-btn';
+  addBtn.textContent = '+ Add Group';
+  addBtn.onclick = () => {
     const inline = document.getElementById('add-group-inline');
     inline.classList.toggle('show');
-    if (inline.classList.contains('show')) {
-      document.getElementById('new-group-input').focus();
-    }
+    if (inline.classList.contains('show')) document.getElementById('new-group-input').focus();
   };
-  row.appendChild(add);
+  row.appendChild(addBtn);
+}
+
+function renderColorSwatches() {
+  const sw = document.getElementById('color-swatches');
+  sw.innerHTML = '';
+  COLORS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'color-swatch'+(c.id===selectedColor?' selected':'');
+    d.dataset.color = c.id; d.title = c.label;
+    d.innerHTML = `<div class="swatch-dot" style="background:${c.hex};box-shadow:0 0 10px ${c.hex}80"></div><span class="swatch-label" style="color:${c.hex}">${c.label.toUpperCase()}</span>`;
+    d.onclick = () => {
+      selectedColor = c.id;
+      document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+      d.classList.add('selected');
+    };
+    sw.appendChild(d);
+  });
 }
 
 function confirmNewGroup() {
@@ -1008,28 +832,13 @@ function addReminder() {
   const title = document.getElementById('input-title').value.trim();
   let valid = true;
 
-  if (!name) {
-    document.getElementById('input-name').classList.add('error');
-    document.getElementById('name-error').classList.add('show');
-    valid = false;
-  } else {
-    document.getElementById('input-name').classList.remove('error');
-    document.getElementById('name-error').classList.remove('show');
-  }
-  if (!title) {
-    document.getElementById('input-title').classList.add('error');
-    document.getElementById('title-error').classList.add('show');
-    valid = false;
-  } else {
-    document.getElementById('input-title').classList.remove('error');
-    document.getElementById('title-error').classList.remove('show');
-  }
-  if (!valid) return;
+  document.getElementById('input-name').classList.toggle('error', !name);
+  document.getElementById('name-error').classList.toggle('show', !name);
+  document.getElementById('input-title').classList.toggle('error', !title);
+  document.getElementById('title-error').classList.toggle('show', !title);
+  if (!name || !title) return;
 
-  if (name !== myName) {
-    myName = name;
-    localStorage.setItem('reminder_name', myName);
-  }
+  if (name !== myName) { myName = name; localStorage.setItem('reminder_name', myName); }
 
   const r = {
     id:      Date.now().toString(36)+Math.random().toString(36).slice(2,6),
@@ -1041,9 +850,149 @@ function addReminder() {
     done:    false,
     created: Date.now()
   };
-
   reminders.unshift(r);
   save(); closeModal('add-modal'); render(); toast('Reminder added ✓');
+}
+
+// ── FILTER MODAL ──────────────────────────────────────────────
+function populateFilterModal() {
+  tmpFilter = {mode:activeFilter.mode, people:[...activeFilter.people], groups:[...activeFilter.groups]};
+  const body = document.getElementById('filter-modal-body');
+  body.innerHTML = '';
+
+  // Mode toggle
+  const modeWrap = document.createElement('div');
+  modeWrap.className = 'form-group';
+  modeWrap.innerHTML = `
+    <label>Mode</label>
+    <div class="mode-toggle">
+      <button class="mode-btn out ${tmpFilter.mode==='out'?'active':''}" id="fmode-out" onclick="setTmpMode('out')">
+        <span class="mode-title">Filter Out</span>
+        <span class="mode-sub">hide selected</span>
+      </button>
+      <button class="mode-btn in ${tmpFilter.mode==='in'?'active':''}" id="fmode-in" onclick="setTmpMode('in')">
+        <span class="mode-title">Filter In</span>
+        <span class="mode-sub">show selected</span>
+      </button>
+    </div>
+  `;
+  body.appendChild(modeWrap);
+
+  // People
+  const people = [...new Set(reminders.map(r=>r.author).filter(Boolean))];
+  if (people.length > 0) {
+    const lbl = document.createElement('div');
+    lbl.className='filter-section-label'; lbl.textContent='People';
+    body.appendChild(lbl);
+    people.forEach(p => body.appendChild(makeFilterOpt('person', p, p, reminders.filter(r=>r.author===p).length, personColor(p))));
+  }
+
+  // Groups
+  const glbl = document.createElement('div');
+  glbl.className='filter-section-label';
+  if (people.length>0) glbl.style.marginTop='8px';
+  glbl.textContent='Groups';
+  body.appendChild(glbl);
+  groups.forEach(g => body.appendChild(makeFilterOpt('group', g, g, reminders.filter(r=>(r.group||'General')===g).length, groupColor(g))));
+
+  // Actions
+  const actions = document.createElement('div');
+  actions.style.cssText='display:flex;gap:10px;margin-top:4px';
+  actions.innerHTML=`
+    <button class="btn-danger" style="flex:1;padding:12px;font-size:13px" onclick="clearFilter();closeModal('filter-modal')">Clear</button>
+    <button class="btn-primary" style="flex:2;padding:12px;font-size:13px" onclick="applyFilter()">Apply</button>
+  `;
+  body.appendChild(actions);
+}
+
+function makeFilterOpt(type, key, label, count, color) {
+  const list = type==='person' ? tmpFilter.people : tmpFilter.groups;
+  const sel  = list.includes(key);
+  const d    = document.createElement('div');
+  d.className = 'filter-opt'+(sel?(tmpFilter.mode==='out'?' selected-out':' selected-in'):'');
+  d.id = `fopt-${type}-${key}`;
+  d.innerHTML = `
+    <div class="filter-opt-dot" style="background:${color}"></div>
+    <span class="filter-opt-name">${esc(label)}</span>
+    <span class="filter-opt-cnt">${count}</span>
+    <div class="filter-opt-check">${sel?'✓':''}</div>
+  `;
+  d.onclick = () => {
+    const lst = type==='person' ? tmpFilter.people : tmpFilter.groups;
+    const idx = lst.indexOf(key);
+    if(idx>=0) lst.splice(idx,1); else lst.push(key);
+    const nowSel = lst.includes(key);
+    d.className = 'filter-opt'+(nowSel?(tmpFilter.mode==='out'?' selected-out':' selected-in'):'');
+    d.querySelector('.filter-opt-check').textContent = nowSel?'✓':'';
+  };
+  return d;
+}
+
+function setTmpMode(mode) {
+  tmpFilter.mode = mode;
+  document.getElementById('fmode-out').className=`mode-btn out ${mode==='out'?'active':''}`;
+  document.getElementById('fmode-in').className =`mode-btn in  ${mode==='in' ?'active':''}`;
+  document.querySelectorAll('.filter-opt').forEach(el=>{
+    const wasSel = el.classList.contains('selected-out')||el.classList.contains('selected-in');
+    if(wasSel){
+      el.classList.remove('selected-out','selected-in');
+      el.classList.add(mode==='out'?'selected-out':'selected-in');
+    }
+  });
+}
+
+function applyFilter() {
+  activeFilter = {...tmpFilter};
+  saveFilter(); render(); closeModal('filter-modal');
+}
+
+// ── IMPORT ────────────────────────────────────────────────────
+function openImportModal() {
+  importMode='merge';
+  document.getElementById('import-merge-btn').classList.add('active');
+  document.getElementById('import-overwrite-btn').classList.remove('active');
+  document.getElementById('import-mode-desc').textContent='Adds new reminders from the file. Existing ones are kept — no duplicates.';
+  openModal('import-modal');
+}
+function setImportMode(mode) {
+  importMode=mode;
+  document.getElementById('import-merge-btn').classList.toggle('active', mode==='merge');
+  document.getElementById('import-overwrite-btn').classList.toggle('active', mode==='overwrite');
+  document.getElementById('import-mode-desc').textContent = mode==='merge'
+    ? 'Adds new reminders from the file. Existing ones are kept — no duplicates.'
+    : '⚠️ Replaces ALL current reminders with the imported file. This cannot be undone.';
+}
+function triggerImport() { document.getElementById('import-input').click(); }
+function importData(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const imp=JSON.parse(ev.target.result);
+      if(!Array.isArray(imp)) throw 0;
+      if(importMode==='overwrite'){
+        reminders=imp;
+      } else {
+        const ids=new Set(reminders.map(r=>r.id));
+        const fresh=imp.filter(r=>!ids.has(r.id));
+        reminders=[...fresh,...reminders];
+      }
+      // Merge any new groups
+      imp.forEach(r=>{ if(r.group && !groups.includes(r.group)) groups.push(r.group); });
+      save(); saveGroups(); render(); closeModal('import-modal');
+      toast(importMode==='overwrite'?`Overwrote with ${imp.length} reminder${imp.length!==1?'s':''} ✓`:`Merged ✓`);
+    }catch{ toast('Invalid file ✕'); }
+  };
+  reader.readAsText(file); e.target.value='';
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function exportData() {
+  const b=new Blob([JSON.stringify(reminders,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=`reminders-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); toast('Exported ✓');
 }
 
 // ── ACTIONS ───────────────────────────────────────────────────
@@ -1060,69 +1009,15 @@ function deleteReminder(id,e){
 
 // ── MODALS ────────────────────────────────────────────────────
 function openModal(id){
-  // Close others first
   ['add-modal','filter-modal','import-modal','info-modal'].forEach(m=>{ if(m!==id) document.getElementById(m).classList.remove('open'); });
   document.getElementById(id).classList.add('open');
   if(id==='add-modal')    populateAddModal();
   if(id==='filter-modal') populateFilterModal();
 }
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-function backdropClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function backdropClose(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
 
-// ── IMPORT MODAL ──────────────────────────────────────────────
-function openImportModal(){
-  importMode='merge';
-  document.getElementById('import-merge-btn').classList.add('active');
-  document.getElementById('import-overwrite-btn').classList.remove('active');
-  document.getElementById('import-mode-desc').textContent='Adds new reminders from the file. Existing ones are kept — no duplicates.';
-  openModal('import-modal');
-}
-function setImportMode(mode){
-  importMode=mode;
-  document.getElementById('import-merge-btn').classList.toggle('active', mode==='merge');
-  document.getElementById('import-overwrite-btn').classList.toggle('active', mode==='overwrite');
-  document.getElementById('import-mode-desc').textContent =
-    mode==='merge'
-      ? 'Adds new reminders from the file. Existing ones are kept — no duplicates.'
-      : '⚠️ Replaces ALL current reminders with the imported file. This cannot be undone.';
-}
-function triggerImport(){document.getElementById('import-input').click();}
-function importData(e){
-  const file=e.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const imp=JSON.parse(ev.target.result);
-      if(!Array.isArray(imp))throw 0;
-      if(importMode==='overwrite'){
-        reminders=imp;
-        save(); render(); closeModal('import-modal');
-        toast(`Overwrote with ${imp.length} reminder${imp.length!==1?'s':''} ✓`);
-      } else {
-        const ids=new Set(reminders.map(r=>r.id));
-        const fresh=imp.filter(r=>!ids.has(r.id));
-        reminders=[...fresh,...reminders];
-        save(); render(); closeModal('import-modal');
-        toast(`Merged ${fresh.length} new reminder${fresh.length!==1?'s':''} ✓`);
-      }
-      // Also merge any new groups from import
-      imp.forEach(r=>{ if(r.group && !groups.includes(r.group)){ groups.push(r.group); } });
-      saveGroups();
-    }catch{toast('Invalid file ✕');}
-  };
-  reader.readAsText(file); e.target.value='';
-}
-
-// ── EXPORT ────────────────────────────────────────────────────
-function exportData(){
-  const b=new Blob([JSON.stringify(reminders,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(b);
-  a.download=`reminders-${new Date().toISOString().slice(0,10)}.json`;
-  a.click(); toast('Exported ✓');
-}
-
-// ── COLOURS ───────────────────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────
 function personColor(n){
   const c=['#00c8d4','#ff4d6d','#f7c948','#3dd68c','#a78bfa','#f472b6'];
   return c[Math.abs(hashStr(n))%c.length];
@@ -1144,8 +1039,8 @@ function toast(msg){
 
 // ── KEYBOARD ──────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')['add-modal','filter-modal','import-modal','info-modal'].forEach(closeModal);
-  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openModal('add-modal');}
+  if(e.key==='Escape') ['add-modal','filter-modal','import-modal','info-modal'].forEach(closeModal);
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openAddModal(null);}
 });
 
 render();
