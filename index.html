@@ -595,9 +595,9 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
       <div class="info-section">
         <h3>Filtering</h3>
         <ul>
-          <li><strong>Filter Out</strong> — everything shown, select items to hide.</li>
-          <li><strong>Filter In</strong> — nothing shown, select items to show.</li>
-          <li>People and groups work as an AND condition.</li>
+          <li><strong>Filter Out</strong> — all boxes start unticked. Tick the people or groups you want to <em>hide</em>.</li>
+          <li><strong>Filter In</strong> — all boxes start ticked. Untick the people or groups you want to <em>remove</em> from view.</li>
+          <li>People and groups work as an AND condition — both must match to be affected.</li>
           <li>Tap <strong>Filtered ✕</strong> in the header to clear instantly.</li>
         </ul>
       </div>
@@ -932,12 +932,28 @@ function setTmpMode(mode) {
   tmpFilter.mode = mode;
   document.getElementById('fmode-out').className=`mode-btn out ${mode==='out'?'active':''}`;
   document.getElementById('fmode-in').className =`mode-btn in  ${mode==='in' ?'active':''}`;
+
+  // Filter In → tick all (deselect what you don't want shown)
+  // Filter Out → untick all (select what you want hidden)
+  const allPeople = [...new Set(reminders.map(r=>r.author).filter(Boolean))];
+  const allGroups = [...groups];
+  if (mode==='in') {
+    tmpFilter.people = [...allPeople];
+    tmpFilter.groups = [...allGroups];
+  } else {
+    tmpFilter.people = [];
+    tmpFilter.groups = [];
+  }
+
+  // Re-render opt states
   document.querySelectorAll('.filter-opt').forEach(el=>{
-    const wasSel = el.classList.contains('selected-out')||el.classList.contains('selected-in');
-    if(wasSel){
-      el.classList.remove('selected-out','selected-in');
-      el.classList.add(mode==='out'?'selected-out':'selected-in');
-    }
+    const parts = el.id.replace('fopt-','').split('-');
+    const type  = parts[0];
+    const key   = parts.slice(1).join('-');
+    const list  = type==='person' ? tmpFilter.people : tmpFilter.groups;
+    const sel   = list.includes(key);
+    el.className = 'filter-opt'+(sel?(mode==='out'?' selected-out':' selected-in'):'');
+    el.querySelector('.filter-opt-check').textContent = sel?'✓':'';
   });
 }
 
