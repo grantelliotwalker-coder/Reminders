@@ -551,8 +551,13 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
     <div class="modal-body">
       <div class="form-group">
         <label>Who is this for? *</label>
-        <input class="form-input" id="input-name" type="text" placeholder="Your name" autocorrect="off" autocapitalize="words" spellcheck="false">
-        <div class="form-error" id="name-error">Name is required</div>
+        <div class="group-pill-row" id="name-pill-row"></div>
+        <div class="add-group-inline" id="add-name-inline">
+          <input type="text" id="new-name-input" placeholder="Your name…" autocorrect="off" autocapitalize="words" spellcheck="false"
+            onkeydown="if(event.key==='Enter')confirmNewName()">
+          <button onclick="confirmNewName()">Add</button>
+        </div>
+        <div class="form-error" id="name-error">Please select or add a name</div>
       </div>
       <div class="form-group">
         <label>Reminder *</label>
@@ -738,12 +743,15 @@ function getColor(id) { return COLORS.find(c=>c.id===id)||COLORS[2]; }
 let reminders    = safeJSON('reminders', []);
 let groups       = safeJSON('reminder_groups', ['General']);
 if (!groups.includes('General')) groups.unshift('General');
+let names        = safeJSON('reminder_names', []);
+// Seed names from existing reminders
+reminders.forEach(r=>{ if(r.author && !names.includes(r.author)) names.push(r.author); });
 
-let activeFilter = safeJSON('reminder_filter', {mode:'out', people:[], groups:[]});
+let activeFilter  = safeJSON('reminder_filter', {mode:'out', people:[], groups:[]});
 let selectedColor = 'green';
-let selectedGroup = 'General';   // always resets to General on open
+let selectedGroup = 'General';
+let selectedName  = names.length===1 ? names[0] : (localStorage.getItem('reminder_name')||'');
 let importMode    = 'merge';
-let myName        = localStorage.getItem('reminder_name') || '';
 
 // tmp filter state while modal open
 let tmpFilter = {mode:'out', people:[], groups:[]};
@@ -751,6 +759,7 @@ let tmpFilter = {mode:'out', people:[], groups:[]};
 function safeJSON(k,fb){ try{const v=JSON.parse(localStorage.getItem(k)); return v!==null?v:fb;}catch(e){return fb;} }
 function save()       { localStorage.setItem('reminders', JSON.stringify(reminders)); }
 function saveGroups() { localStorage.setItem('reminder_groups', JSON.stringify(groups)); }
+function saveNames()  { localStorage.setItem('reminder_names', JSON.stringify(names)); }
 function saveFilter() { localStorage.setItem('reminder_filter', JSON.stringify(activeFilter)); }
 
 // ── FILTER ────────────────────────────────────────────────────
@@ -869,14 +878,17 @@ function openAddModal(presetGroup) {
 }
 
 function populateAddModal() {
-  document.getElementById('input-name').value  = myName;
   document.getElementById('input-title').value = '';
   document.getElementById('input-note').value  = '';
-  ['input-name','input-title'].forEach(id=>document.getElementById(id).classList.remove('error'));
-  ['name-error','title-error'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  document.getElementById('input-title').classList.remove('error');
+  document.getElementById('title-error').classList.remove('show');
+  document.getElementById('name-error').classList.remove('show');
   document.getElementById('add-group-inline').classList.remove('show');
   document.getElementById('new-group-input').value = '';
+  document.getElementById('add-name-inline').classList.remove('show');
+  document.getElementById('new-name-input').value = '';
 
+  renderNamePills();
   renderGroupPills();
   renderColorSwatches();
 
@@ -888,6 +900,46 @@ function populateAddModal() {
   updateSyncRow();
 
   setTimeout(()=>document.getElementById('input-title').focus(), 320);
+}
+
+function renderNamePills() {
+  const row = document.getElementById('name-pill-row');
+  row.innerHTML = '';
+  names.forEach(n => {
+    const p = document.createElement('button');
+    p.className = 'group-pill-sel'+(n===selectedName?' active':'');
+    p.textContent = n;
+    p.onclick = () => {
+      selectedName = n;
+      localStorage.setItem('reminder_name', n);
+      document.querySelectorAll('#name-pill-row .group-pill-sel:not(.add-group-btn)').forEach(b=>b.classList.remove('active'));
+      p.classList.add('active');
+      document.getElementById('name-error').classList.remove('show');
+    };
+    row.appendChild(p);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'group-pill-sel add-group-btn';
+  addBtn.textContent = '+ Add Name';
+  addBtn.onclick = () => {
+    const inline = document.getElementById('add-name-inline');
+    inline.classList.toggle('show');
+    if (inline.classList.contains('show')) document.getElementById('new-name-input').focus();
+  };
+  row.appendChild(addBtn);
+}
+
+function confirmNewName() {
+  const input = document.getElementById('new-name-input');
+  const name  = input.value.trim();
+  if (!name || names.includes(name)) { input.value=''; return; }
+  names.push(name);
+  saveNames();
+  selectedName = name;
+  localStorage.setItem('reminder_name', name);
+  input.value = '';
+  document.getElementById('add-name-inline').classList.remove('show');
+  renderNamePills();
 }
 
 function renderGroupPills() {
@@ -945,17 +997,18 @@ function confirmNewGroup() {
 }
 
 function addReminder() {
-  const name  = document.getElementById('input-name').value.trim();
   const title = document.getElementById('input-title').value.trim();
   let valid = true;
 
-  document.getElementById('input-name').classList.toggle('error', !name);
-  document.getElementById('name-error').classList.toggle('show', !name);
+  if (!selectedName) {
+    document.getElementById('name-error').classList.add('show');
+    valid = false;
+  } else {
+    document.getElementById('name-error').classList.remove('show');
+  }
   document.getElementById('input-title').classList.toggle('error', !title);
   document.getElementById('title-error').classList.toggle('show', !title);
-  if (!name || !title) return;
-
-  if (name !== myName) { myName = name; localStorage.setItem('reminder_name', myName); }
+  if (!valid || !title) return;
 
   const r = {
     id:      Date.now().toString(36)+Math.random().toString(36).slice(2,6),
@@ -963,7 +1016,7 @@ function addReminder() {
     note:    document.getElementById('input-note').value.trim(),
     group:   selectedGroup,
     color:   selectedColor,
-    author:  myName,
+    author:  selectedName,
     done:    false,
     created: Date.now()
   };
@@ -971,7 +1024,7 @@ function addReminder() {
   save(); closeModal('add-modal'); render(); toast('Reminder added ✓');
 
   if (syncEnabled()) {
-    ghPush(r)
+    ghPushAll()
       .then(()=>toast('Synced to GitHub ✓'))
       .catch(e=>{ console.warn('GitHub push failed',e); toast('Add OK — sync failed ✕'); });
   }
@@ -1138,12 +1191,16 @@ function exportData() {
 function toggleDone(id,e){
   e.stopPropagation();
   const r=reminders.find(x=>x.id===id);
-  if(r){r.done=!r.done;save();render();}
+  if(r){
+    r.done=!r.done; save(); render();
+    if(ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
+  }
 }
 function deleteReminder(id,e){
   e.stopPropagation();
   reminders=reminders.filter(x=>x.id!==id);
-  save();render();toast('Removed');
+  save(); render(); toast('Removed');
+  if(ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
 }
 
 // ── MODALS ────────────────────────────────────────────────────
@@ -1243,18 +1300,17 @@ async function ghFetch() {
   return JSON.parse(atob(d.content.replace(/\n/g,'')));
 }
 
-async function ghPush(newReminder) {
+async function ghPushAll() {
   const branch = localStorage.getItem('gh_branch')||'main';
-  let sha=null, existing=[];
+  // Get current SHA
+  let sha = null;
   try {
     const g = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
-    if (g.ok) { const d=await g.json(); sha=d.sha; existing=JSON.parse(atob(d.content.replace(/\n/g,''))); }
+    if (g.ok) { const d=await g.json(); sha=d.sha; }
   } catch(e) {}
-  const ids = new Set(existing.map(r=>r.id));
-  if (!ids.has(newReminder.id)) existing.unshift(newReminder);
   const body = {
-    message: `Add reminder by ${newReminder.author||'user'}`,
-    content: btoa(unescape(encodeURIComponent(JSON.stringify(existing,null,2)))),
+    message: `Update reminders`,
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(reminders,null,2)))),
     branch
   };
   if (sha) body.sha = sha;
@@ -1318,13 +1374,19 @@ async function init() {
       if (data) {
         const ids   = new Set(reminders.map(r=>r.id));
         const fresh = data.filter(r=>!ids.has(r.id));
-        if (fresh.length > 0) {
-          reminders = [...fresh, ...reminders];
-          // Merge new groups from pulled data
-          data.forEach(r=>{ if(r.group && !groups.includes(r.group)) groups.push(r.group); });
-          save(); saveGroups(); render();
-          toast(`Pulled ${fresh.length} new reminder${fresh.length!==1?'s':''} ✓`);
-        }
+        // Merge done states for existing reminders too
+        data.forEach(remote => {
+          const local = reminders.find(r=>r.id===remote.id);
+          if (local && local.done !== remote.done) local.done = remote.done;
+        });
+        if (fresh.length > 0) reminders = [...fresh, ...reminders];
+        // Merge groups and names from pulled data
+        data.forEach(r=>{
+          if(r.group  && !groups.includes(r.group))  groups.push(r.group);
+          if(r.author && !names.includes(r.author))  names.push(r.author);
+        });
+        save(); saveGroups(); saveNames(); render();
+        if (fresh.length > 0) toast(`Pulled ${fresh.length} new reminder${fresh.length!==1?'s':''} ✓`);
       }
     } catch(e) { console.warn('GitHub pull failed', e); }
   }
