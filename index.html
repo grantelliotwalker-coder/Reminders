@@ -296,6 +296,38 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
 .mode-btn.active.out { color:var(--red); }
 .mode-btn.active.in  { color:var(--green); }
 
+/* ── SYNC ROW ── */
+.sync-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 14px; background:var(--surface2);
+  border:1.5px solid var(--border2); border-radius:12px;
+}
+.sync-row.disabled { opacity:0.4; pointer-events:none; }
+.sync-label { display:flex; flex-direction:column; gap:3px; flex:1; min-width:0; }
+.sync-label-text { font-size:13px; font-weight:600; }
+.sync-label-sub  { font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+
+/* toggle switch */
+.toggle-input { display:none; }
+.toggle-track {
+  width:44px; height:26px; border-radius:13px;
+  background:var(--surface3); border:1.5px solid var(--border2);
+  cursor:pointer; position:relative; transition:background 0.2s, border-color 0.2s;
+  flex-shrink:0;
+}
+.toggle-track.on { background:var(--accent); border-color:var(--accent); }
+.toggle-thumb {
+  position:absolute; top:3px; left:3px;
+  width:18px; height:18px; border-radius:50%;
+  background:#fff; transition:transform 0.2s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle-track.on .toggle-thumb { transform:translateX(18px); }
+
+/* ── GH TEST RESULT ── */
+#gh-test-result.ok  { background:rgba(61,214,140,0.1); border:1.5px solid var(--green); color:var(--green); }
+#gh-test-result.err { background:rgba(255,77,109,0.1); border:1.5px solid var(--red);   color:var(--red);   }
+
 /* ── FILTER ACTIVE BAR ── */
 #filter-bar-active {
   flex:0 0 auto;
@@ -511,6 +543,7 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
     <div class="modal-header">
       <span class="modal-title">New Reminder</span>
       <div style="display:flex;gap:8px;align-items:center">
+        <button class="modal-close" style="font-size:13px" onclick="openModal('settings-modal')" aria-label="Settings">⚙️</button>
         <button class="modal-close" style="font-size:13px" onclick="openModal('info-modal')" aria-label="Help">ℹ️</button>
         <button class="modal-close" onclick="closeModal('add-modal')" aria-label="Close">✕</button>
       </div>
@@ -543,6 +576,18 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
         <label>Priority</label>
         <div class="color-swatches" id="color-swatches"></div>
       </div>
+      <!-- Sync toggle -->
+      <div id="sync-row" class="sync-row">
+        <label class="sync-label" for="sync-enabled">
+          <span class="sync-label-text">Enable GitHub Sync</span>
+          <span class="sync-label-sub" id="sync-sub">Configure in ⚙️ Settings first</span>
+        </label>
+        <div class="toggle-wrap">
+          <input type="checkbox" id="sync-enabled" class="toggle-input">
+          <div class="toggle-track" onclick="toggleSync()"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+
       <button class="btn-primary" onclick="addReminder()">+ Add Reminder</button>
     </div>
   </div>
@@ -560,7 +605,48 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
   </div>
 </div>
 
-<!-- ══ IMPORT MODAL ══ -->
+<!-- ══ SETTINGS MODAL ══ -->
+<div class="modal-backdrop" id="settings-modal" onclick="backdropClose(event,'settings-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">GitHub Sync</span>
+      <button class="modal-close" onclick="closeModal('settings-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Personal Access Token</label>
+        <input class="form-input" id="gh-token" type="password" placeholder="ghp_…" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
+      </div>
+      <div class="form-group">
+        <label>Repository</label>
+        <input class="form-input" id="gh-repo" type="text" placeholder="owner/repo" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
+      </div>
+      <div class="form-group">
+        <label>File path</label>
+        <input class="form-input" id="gh-path" type="text" placeholder="reminders.json" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
+      </div>
+      <div class="form-group">
+        <label>Branch</label>
+        <input class="form-input" id="gh-branch" type="text" placeholder="main" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn-primary" style="flex:1;padding:12px;font-size:13px" onclick="saveGHSettings()">Save</button>
+        <button class="btn-primary" style="flex:1;padding:12px;font-size:13px;background:var(--surface3);border:1.5px solid var(--border2);color:var(--muted);box-shadow:none" onclick="testGHSettings()">Test</button>
+      </div>
+
+      <div id="gh-test-result" style="display:none;padding:10px 14px;border-radius:10px;font-size:12px;font-family:'JetBrains Mono',monospace;line-height:1.5"></div>
+
+      <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:4px">
+        Token needs <strong>Contents: Read &amp; Write</strong> on your repo.<br>
+        Go to GitHub → Settings → Developer settings → Fine-grained tokens.
+      </p>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal-backdrop" id="import-modal" onclick="backdropClose(event,'import-modal')">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -794,6 +880,13 @@ function populateAddModal() {
   renderGroupPills();
   renderColorSwatches();
 
+  // Reset sync toggle state for this open
+  const cb = document.getElementById('sync-enabled');
+  delete cb.dataset.manuallySet;
+  cb.checked = ghConfigured();
+  document.querySelector('.toggle-track').classList.toggle('on', cb.checked);
+  updateSyncRow();
+
   setTimeout(()=>document.getElementById('input-title').focus(), 320);
 }
 
@@ -876,6 +969,12 @@ function addReminder() {
   };
   reminders.unshift(r);
   save(); closeModal('add-modal'); render(); toast('Reminder added ✓');
+
+  if (syncEnabled()) {
+    ghPush(r)
+      .then(()=>toast('Synced to GitHub ✓'))
+      .catch(e=>{ console.warn('GitHub push failed',e); toast('Add OK — sync failed ✕'); });
+  }
 }
 
 // ── FILTER MODAL ──────────────────────────────────────────────
@@ -1049,10 +1148,11 @@ function deleteReminder(id,e){
 
 // ── MODALS ────────────────────────────────────────────────────
 function openModal(id){
-  ['add-modal','filter-modal','import-modal','info-modal'].forEach(m=>{ if(m!==id) document.getElementById(m).classList.remove('open'); });
+  ['add-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(m=>{ if(m!==id) document.getElementById(m).classList.remove('open'); });
   document.getElementById(id).classList.add('open');
-  if(id==='add-modal')    populateAddModal();
-  if(id==='filter-modal') populateFilterModal();
+  if(id==='add-modal')      populateAddModal();
+  if(id==='filter-modal')   populateFilterModal();
+  if(id==='settings-modal') populateSettingsModal();
 }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 function backdropClose(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
@@ -1077,13 +1177,160 @@ function toast(msg){
   toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
 }
 
+// ── GITHUB SETTINGS ───────────────────────────────────────────
+function ghConfigured() {
+  return !!(localStorage.getItem('gh_token') && localStorage.getItem('gh_repo'));
+}
+function ghApiUrl() {
+  const repo = localStorage.getItem('gh_repo')||'';
+  const path = localStorage.getItem('gh_path')||'reminders.json';
+  return `https://api.github.com/repos/${repo}/contents/${path}`;
+}
+function ghHeaders() {
+  return { Authorization:`Bearer ${localStorage.getItem('gh_token')}`, Accept:'application/vnd.github.v3+json' };
+}
+
+function populateSettingsModal() {
+  document.getElementById('gh-token').value  = localStorage.getItem('gh_token')||'';
+  document.getElementById('gh-repo').value   = localStorage.getItem('gh_repo')||'';
+  document.getElementById('gh-path').value   = localStorage.getItem('gh_path')||'reminders.json';
+  document.getElementById('gh-branch').value = localStorage.getItem('gh_branch')||'main';
+  const res = document.getElementById('gh-test-result');
+  res.style.display='none'; res.className=''; res.textContent='';
+}
+
+function saveGHSettings() {
+  localStorage.setItem('gh_token',  document.getElementById('gh-token').value.trim());
+  localStorage.setItem('gh_repo',   document.getElementById('gh-repo').value.trim());
+  localStorage.setItem('gh_path',   document.getElementById('gh-path').value.trim()||'reminders.json');
+  localStorage.setItem('gh_branch', document.getElementById('gh-branch').value.trim()||'main');
+  updateSyncRow();
+  toast('Settings saved ✓');
+}
+
+async function testGHSettings() {
+  saveGHSettings();
+  const res = document.getElementById('gh-test-result');
+  res.style.display='block'; res.className=''; res.textContent='Testing…';
+  try {
+    const branch = localStorage.getItem('gh_branch')||'main';
+    const r = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
+    if (r.ok) {
+      res.className='ok';
+      res.textContent='✓ Connected — file found and readable';
+      localStorage.setItem('gh_tested','1');
+      updateSyncRow();
+    } else {
+      const d = await r.json();
+      res.className='err';
+      res.textContent=`✕ ${r.status}: ${d.message||'Check token, repo and file path'}`;
+      localStorage.removeItem('gh_tested');
+      updateSyncRow();
+    }
+  } catch(e) {
+    res.className='err';
+    res.textContent='✕ Network error — check your connection';
+    localStorage.removeItem('gh_tested');
+    updateSyncRow();
+  }
+}
+
+async function ghFetch() {
+  const branch = localStorage.getItem('gh_branch')||'main';
+  const r = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
+  if (!r.ok) return null;
+  const d = await r.json();
+  return JSON.parse(atob(d.content.replace(/\n/g,'')));
+}
+
+async function ghPush(newReminder) {
+  const branch = localStorage.getItem('gh_branch')||'main';
+  let sha=null, existing=[];
+  try {
+    const g = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
+    if (g.ok) { const d=await g.json(); sha=d.sha; existing=JSON.parse(atob(d.content.replace(/\n/g,''))); }
+  } catch(e) {}
+  const ids = new Set(existing.map(r=>r.id));
+  if (!ids.has(newReminder.id)) existing.unshift(newReminder);
+  const body = {
+    message: `Add reminder by ${newReminder.author||'user'}`,
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(existing,null,2)))),
+    branch
+  };
+  if (sha) body.sha = sha;
+  const r = await fetch(ghApiUrl(), {
+    method:'PUT',
+    headers:{...ghHeaders(),'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(await r.text());
+}
+
+// ── SYNC ROW ──────────────────────────────────────────────────
+function updateSyncRow() {
+  const configured = ghConfigured();
+  const row   = document.getElementById('sync-row');
+  const track = document.querySelector('.toggle-track');
+  const sub   = document.getElementById('sync-sub');
+  const cb    = document.getElementById('sync-enabled');
+
+  if (!configured) {
+    row.classList.add('disabled');
+    sub.textContent = 'Configure in ⚙️ Settings first';
+    cb.checked = false;
+    track.classList.remove('on');
+  } else {
+    row.classList.remove('disabled');
+    sub.textContent = 'Pulls on load · pushes on add';
+    // Default on if configured
+    if (cb.checked === false && !cb.dataset.manuallySet) {
+      cb.checked = true;
+      track.classList.add('on');
+    }
+  }
+}
+
+function toggleSync() {
+  if (!ghConfigured()) return;
+  const cb    = document.getElementById('sync-enabled');
+  const track = document.querySelector('.toggle-track');
+  cb.checked = !cb.checked;
+  cb.dataset.manuallySet = '1';
+  track.classList.toggle('on', cb.checked);
+}
+
+function syncEnabled() {
+  return ghConfigured() && document.getElementById('sync-enabled').checked;
+}
+
 // ── KEYBOARD ──────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') ['add-modal','filter-modal','import-modal','info-modal'].forEach(closeModal);
+  if(e.key==='Escape') ['add-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(closeModal);
   if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openAddModal(null);}
 });
 
-render();
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  render();
+  if (ghConfigured()) {
+    try {
+      const data = await ghFetch();
+      if (data) {
+        const ids   = new Set(reminders.map(r=>r.id));
+        const fresh = data.filter(r=>!ids.has(r.id));
+        if (fresh.length > 0) {
+          reminders = [...fresh, ...reminders];
+          // Merge new groups from pulled data
+          data.forEach(r=>{ if(r.group && !groups.includes(r.group)) groups.push(r.group); });
+          save(); saveGroups(); render();
+          toast(`Pulled ${fresh.length} new reminder${fresh.length!==1?'s':''} ✓`);
+        }
+      }
+    } catch(e) { console.warn('GitHub pull failed', e); }
+  }
+}
+
+init();
 </script>
 </body>
 </html>
