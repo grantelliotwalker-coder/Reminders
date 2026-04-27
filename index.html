@@ -102,8 +102,9 @@ header {
 main {
   flex:1 1 0; overflow-y:auto;
   -webkit-overflow-scrolling:touch;
-  padding:14px 13px 4px;
+  padding:14px 13px 20px;
   display:flex; flex-direction:column; gap:0;
+  min-height:0;
 }
 main::-webkit-scrollbar { width:3px; }
 main::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
@@ -152,12 +153,16 @@ main::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
   padding:10px 12px; border-radius:50px;
   background:var(--surface2); border:1.5px solid var(--border2);
   animation:slideIn 0.18s ease;
-  transition:opacity 0.25s;
+  transition:opacity 0.25s, border-color 0.15s, box-shadow 0.15s;
+  cursor:pointer;
 }
 @keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-.reminder-pill:active { transform:scale(0.985); }
 .reminder-pill.done { opacity:0.35; }
 .reminder-pill.done .pill-title { text-decoration:line-through; }
+.reminder-pill.selected {
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(0,200,212,0.18);
+}
 
 .pill-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 .pill-check {
@@ -598,6 +603,43 @@ textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
   </div>
 </div>
 
+<!-- ══ EDIT MODAL ══ -->
+<div class="modal-backdrop" id="edit-modal" onclick="backdropClose(event,'edit-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Edit Reminder</span>
+      <button class="modal-close" onclick="closeModal('edit-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Reminder *</label>
+        <input class="form-input" id="edit-title" type="text" placeholder="What do you need to remember?" autocorrect="off">
+        <div class="form-error" id="edit-title-error">Reminder text is required</div>
+      </div>
+      <div class="form-group">
+        <label>Note <span style="font-weight:400;opacity:0.5;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="form-input" id="edit-note" placeholder="Extra details…" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Group</label>
+        <div class="group-pill-row" id="edit-group-pill-row"></div>
+        <div class="add-group-inline" id="edit-add-group-inline">
+          <input type="text" id="edit-new-group-input" placeholder="Group name…" autocorrect="off"
+            onkeydown="if(event.key==='Enter')confirmEditNewGroup()">
+          <button onclick="confirmEditNewGroup()">Add</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <div class="color-swatches" id="edit-color-swatches"></div>
+      </div>
+      <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
+      <button class="btn-danger" onclick="deleteFromEdit()">Delete Reminder</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ FILTER MODAL ══ -->
 <div class="modal-backdrop" id="filter-modal" onclick="backdropClose(event,'filter-modal')">
   <div class="modal">
@@ -855,6 +897,7 @@ function makePill(r) {
   el.className = 'reminder-pill'+(r.done?' done':'');
   el.style.setProperty('--pill-color', col.hex);
   el.dataset.id = r.id;
+  el.onclick = (e) => handlePillTap(r.id, e);
   el.innerHTML = `
     <div class="pill-dot" style="background:${col.hex};box-shadow:0 0 7px ${col.hex}80"></div>
     <div class="pill-check" onclick="toggleDone('${r.id}',event)">${r.done?'✓':''}</div>
@@ -1187,6 +1230,134 @@ function exportData() {
   a.click(); toast('Exported ✓');
 }
 
+// ── SELECTED PILL ─────────────────────────────────────────────
+let selectedPillId = null;
+
+function handlePillTap(id, e) {
+  // Don't intercept check or delete button taps
+  if (e.target.closest('.pill-check') || e.target.closest('.pill-delete')) return;
+
+  if (selectedPillId === id) {
+    // Second tap — open edit modal
+    openEditModal(id);
+  } else {
+    // First tap — select it
+    deselectAll();
+    selectedPillId = id;
+    const el = document.querySelector(`.reminder-pill[data-id="${id}"]`);
+    if (el) el.classList.add('selected');
+  }
+}
+
+function deselectAll() {
+  selectedPillId = null;
+  document.querySelectorAll('.reminder-pill.selected').forEach(p=>p.classList.remove('selected'));
+}
+
+// ── EDIT MODAL ────────────────────────────────────────────────
+let editingId     = null;
+let editGroup     = 'General';
+let editColor     = 'green';
+
+function openEditModal(id) {
+  const r = reminders.find(x=>x.id===id);
+  if (!r) return;
+  editingId = id;
+  editGroup = r.group || 'General';
+  editColor = r.color || 'green';
+
+  document.getElementById('edit-title').value = r.title;
+  document.getElementById('edit-note').value  = r.note||'';
+  document.getElementById('edit-title').classList.remove('error');
+  document.getElementById('edit-title-error').classList.remove('show');
+  document.getElementById('edit-add-group-inline').classList.remove('show');
+  document.getElementById('edit-new-group-input').value = '';
+
+  renderEditGroupPills();
+  renderEditColorSwatches();
+
+  deselectAll();
+  openModal('edit-modal');
+  setTimeout(()=>document.getElementById('edit-title').focus(), 320);
+}
+
+function renderEditGroupPills() {
+  const row = document.getElementById('edit-group-pill-row');
+  row.innerHTML = '';
+  groups.forEach(g => {
+    const p = document.createElement('button');
+    p.className = 'group-pill-sel'+(g===editGroup?' active':'');
+    p.textContent = g;
+    p.onclick = () => {
+      editGroup = g;
+      document.querySelectorAll('#edit-group-pill-row .group-pill-sel:not(.add-group-btn)').forEach(b=>b.classList.remove('active'));
+      p.classList.add('active');
+    };
+    row.appendChild(p);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'group-pill-sel add-group-btn';
+  addBtn.textContent = '+ Add Group';
+  addBtn.onclick = () => {
+    const inline = document.getElementById('edit-add-group-inline');
+    inline.classList.toggle('show');
+    if (inline.classList.contains('show')) document.getElementById('edit-new-group-input').focus();
+  };
+  row.appendChild(addBtn);
+}
+
+function renderEditColorSwatches() {
+  const sw = document.getElementById('edit-color-swatches');
+  sw.innerHTML = '';
+  COLORS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'color-swatch'+(c.id===editColor?' selected':'');
+    d.dataset.color = c.id; d.title = c.label;
+    d.innerHTML = `<div class="swatch-dot" style="background:${c.hex};box-shadow:0 0 10px ${c.hex}80"></div><span class="swatch-label" style="color:${c.hex}">${c.label.toUpperCase()}</span>`;
+    d.onclick = () => {
+      editColor = c.id;
+      document.querySelectorAll('#edit-color-swatches .color-swatch').forEach(s=>s.classList.remove('selected'));
+      d.classList.add('selected');
+    };
+    sw.appendChild(d);
+  });
+}
+
+function confirmEditNewGroup() {
+  const input = document.getElementById('edit-new-group-input');
+  const name  = input.value.trim();
+  if (!name || groups.includes(name)) { input.value=''; return; }
+  groups.push(name);
+  saveGroups();
+  editGroup = name;
+  input.value = '';
+  document.getElementById('edit-add-group-inline').classList.remove('show');
+  renderEditGroupPills();
+}
+
+function saveEdit() {
+  const title = document.getElementById('edit-title').value.trim();
+  if (!title) {
+    document.getElementById('edit-title').classList.add('error');
+    document.getElementById('edit-title-error').classList.add('show');
+    return;
+  }
+  const r = reminders.find(x=>x.id===editingId);
+  if (!r) return;
+  r.title = title;
+  r.note  = document.getElementById('edit-note').value.trim();
+  r.group = editGroup;
+  r.color = editColor;
+  save(); closeModal('edit-modal'); render(); toast('Reminder updated ✓');
+  if (ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
+}
+
+function deleteFromEdit() {
+  reminders = reminders.filter(x=>x.id!==editingId);
+  save(); closeModal('edit-modal'); render(); toast('Removed');
+  if (ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
+}
+
 // ── ACTIONS ───────────────────────────────────────────────────
 function toggleDone(id,e){
   e.stopPropagation();
@@ -1205,14 +1376,19 @@ function deleteReminder(id,e){
 
 // ── MODALS ────────────────────────────────────────────────────
 function openModal(id){
-  ['add-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(m=>{ if(m!==id) document.getElementById(m).classList.remove('open'); });
+  ['add-modal','edit-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(m=>{ if(m!==id) document.getElementById(m).classList.remove('open'); });
   document.getElementById(id).classList.add('open');
   if(id==='add-modal')      populateAddModal();
   if(id==='filter-modal')   populateFilterModal();
   if(id==='settings-modal') populateSettingsModal();
 }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); deselectAll(); }
 function backdropClose(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
+
+// Tap on main background deselects
+document.getElementById('main-list').addEventListener('click', e=>{
+  if (!e.target.closest('.reminder-pill')) deselectAll();
+});
 
 // ── HELPERS ───────────────────────────────────────────────────
 function personColor(n){
@@ -1361,7 +1537,7 @@ function syncEnabled() {
 
 // ── KEYBOARD ──────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') ['add-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(closeModal);
+  if(e.key==='Escape') ['add-modal','edit-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(closeModal);
   if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openAddModal(null);}
 });
 
