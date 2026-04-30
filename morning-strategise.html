@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Morning Strategise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=DM+Serif+Display:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #8B6914;
+    --gold-pale: #F5E6B8;
+    --black: #0A0A0A;
+    --font: 'Cormorant Garamond', serif;
+    --font-size: 17px;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--black);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    touch-action: none;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 0;
+    position: relative;
+  }
+
+  /* Subtle background grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 28px 20px 12px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--gold-dim) 0%, var(--gold-light) 40%, var(--gold) 60%, var(--gold-pale) 80%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 12px rgba(201,168,76,0.3));
+    line-height: 1;
+    user-select: none;
+  }
+
+  .logo span {
+    font-style: italic;
+    font-size: 0.85em;
+    letter-spacing: 0.22em;
+  }
+
+  /* ── SETTINGS BUTTON ── */
+  .settings-btn {
+    position: absolute;
+    right: 18px;
+    top: 26px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
+  }
+
+  .settings-btn:active {
+    background: rgba(201,168,76,0.18);
+    border-color: rgba(201,168,76,0.6);
+    transform: scale(0.93);
+  }
+
+  .settings-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--gold);
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  /* ── MAIN CARD ── */
+  .card-wrap {
+    flex: 1;
+    width: 100%;
+    padding: 0 16px 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    z-index: 1;
+  }
+
+  .card {
+    flex: 1;
+    border-radius: 28px;
+    padding: 2px;
+    background: linear-gradient(145deg,
+      rgba(201,168,76,0.7) 0%,
+      rgba(232,201,122,0.4) 20%,
+      rgba(139,105,20,0.3) 40%,
+      rgba(201,168,76,0.5) 60%,
+      rgba(245,230,184,0.5) 80%,
+      rgba(201,168,76,0.6) 100%
+    );
+    box-shadow:
+      0 0 40px rgba(201,168,76,0.12),
+      0 20px 60px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(245,230,184,0.3);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .card-inner {
+    flex: 1;
+    border-radius: 26px;
+    background: linear-gradient(160deg,
+      #111008 0%,
+      #0e0d08 30%,
+      #0c0b06 60%,
+      #100f09 100%
+    );
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    min-height: 0;
+  }
+
+  /* Gold shimmer overlay */
+  .card-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(180deg, rgba(201,168,76,0.06) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 26px 26px 0 0;
+  }
+
+  /* ── DATE STRIP ── */
+  .date-strip {
+    padding: 14px 22px 8px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .date-label {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.5;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.15) 70%, transparent);
+    margin: 8px 0 0;
+  }
+
+  /* ── TEXTAREA ── */
+  .strategy-area {
+    flex: 1;
+    padding: 16px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .strategy-textarea {
+    flex: 1;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: rgba(245,230,184,0.88);
+    font-family: var(--font);
+    font-size: var(--font-size);
+    font-weight: 300;
+    line-height: 1.75;
+    letter-spacing: 0.01em;
+    caret-color: var(--gold-light);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201,168,76,0.2) transparent;
+    touch-action: pan-y;
+  }
+
+  .strategy-textarea::-webkit-scrollbar {
+    width: 3px;
+  }
+  .strategy-textarea::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .strategy-textarea::-webkit-scrollbar-thumb {
+    background: rgba(201,168,76,0.25);
+    border-radius: 2px;
+  }
+
+  .strategy-textarea::placeholder {
+    color: rgba(201,168,76,0.22);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  /* ── CHAR COUNT ── */
+  .char-count {
+    flex-shrink: 0;
+    text-align: right;
+    font-family: 'DM Serif Display', serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: rgba(201,168,76,0.28);
+    padding-top: 6px;
+    user-select: none;
+  }
+
+  /* ── SETTINGS PANEL ── */
+  .settings-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .settings-overlay.open {
+    pointer-events: all;
+    opacity: 1;
+  }
+
+  .settings-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+  }
+
+  .settings-sheet {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(170deg, #141209 0%, #0e0c07 100%);
+    border-top: 1px solid rgba(201,168,76,0.3);
+    border-radius: 24px 24px 0 0;
+    padding: 0 24px 40px;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.8);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .settings-overlay.open .settings-sheet {
+    transform: translateY(0);
+  }
+
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(201,168,76,0.25);
+    margin: 12px auto 20px;
+  }
+
+  .sheet-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-bottom: 20px;
+  }
+
+  .section-label {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(201,168,76,0.45);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  /* Font options */
+  .font-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .font-option {
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(201,168,76,0.03);
+    touch-action: manipulation;
+  }
+
+  .font-option:active {
+    transform: scale(0.97);
+  }
+
+  .font-option.active {
+    border-color: rgba(201,168,76,0.55);
+    background: rgba(201,168,76,0.1);
+    box-shadow: 0 0 16px rgba(201,168,76,0.08);
+  }
+
+  .font-name {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgba(201,168,76,0.45);
+    margin-bottom: 4px;
+  }
+
+  .font-option.active .font-name {
+    color: rgba(201,168,76,0.7);
+  }
+
+  .font-preview {
+    font-size: 18px;
+    color: rgba(245,230,184,0.75);
+    line-height: 1.2;
+  }
+
+  /* Font size slider */
+  .size-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .size-label-small {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    color: rgba(201,168,76,0.4);
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+  }
+
+  .size-label-large {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: rgba(201,168,76,0.4);
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+  }
+
+  .size-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold) var(--pct, 40%), rgba(201,168,76,0.15) var(--pct, 40%));
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, var(--gold-light), var(--gold));
+    box-shadow: 0 0 10px rgba(201,168,76,0.4);
+    cursor: pointer;
+  }
+
+  .size-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 12px;
+    color: rgba(201,168,76,0.5);
+    flex-shrink: 0;
+    width: 34px;
+    text-align: right;
+  }
+
+  /* Close btn */
+  .close-btn {
+    width: 100%;
+    margin-top: 22px;
+    padding: 15px;
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 14px;
+    background: rgba(201,168,76,0.06);
+    color: var(--gold);
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+  }
+
+  .close-btn:active {
+    background: rgba(201,168,76,0.14);
+    transform: scale(0.98);
+  }
+
+  /* Safe area */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .card-wrap { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+    .settings-sheet { padding-bottom: max(40px, env(safe-area-inset-bottom)); }
+    .header { padding-top: max(28px, calc(env(safe-area-inset-top) + 14px)); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">Morning <span>Strategise</span></div>
+  <button class="settings-btn" onclick="openSettings()" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Main Card -->
+<div class="card-wrap">
+  <div class="card">
+    <div class="card-inner">
+      <div class="date-strip">
+        <div class="date-label" id="dateLabel"></div>
+        <div class="divider"></div>
+      </div>
+      <div class="strategy-area">
+        <textarea
+          class="strategy-textarea"
+          id="strategyText"
+          placeholder="Write your strategy for tomorrow…"
+          spellcheck="true"
+          autocorrect="on"
+          autocapitalize="sentences"
+        ></textarea>
+        <div class="char-count" id="charCount">0 words</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Panel -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-backdrop" onclick="closeSettings()"></div>
+  <div class="settings-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Preferences</div>
+
+    <div class="section-label">Typeface</div>
+    <div class="font-grid" id="fontGrid">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="section-label">Size</div>
+    <div class="size-row">
+      <span class="size-label-small">A</span>
+      <input type="range" class="size-slider" id="sizeSlider" min="13" max="24" value="17" oninput="onSizeChange(this)">
+      <span class="size-label-large">A</span>
+      <span class="size-value" id="sizeValue">17px</span>
+    </div>
+
+    <button class="close-btn" onclick="closeSettings()">Done</button>
+  </div>
+</div>
+
+<script>
+  // ── DATA ──
+  const FONTS = [
+    { id: 'cormorant', name: 'Cormorant', family: "'Cormorant Garamond', serif", preview: 'Strategy' },
+    { id: 'playfair',  name: 'Playfair',  family: "'Playfair Display', serif",   preview: 'Strategy' },
+    { id: 'lora',      name: 'Lora',      family: "'Lora', serif",               preview: 'Strategy' },
+    { id: 'baskerville', name: 'Baskerville', family: "'Libre Baskerville', serif", preview: 'Strategy' },
+    { id: 'spectral',  name: 'Spectral',  family: "'Spectral', serif",           preview: 'Strategy' },
+    { id: 'crimson',   name: 'Crimson',   family: "'Crimson Pro', serif",        preview: 'Strategy' },
+  ];
+
+  // ── STATE ──
+  let currentFont = localStorage.getItem('ms_font') || 'cormorant';
+  let currentSize = parseInt(localStorage.getItem('ms_size') || '17');
+
+  // ── ELEMENTS ──
+  const textarea    = document.getElementById('strategyText');
+  const charCount   = document.getElementById('charCount');
+  const dateLabel   = document.getElementById('dateLabel');
+  const sizeSlider  = document.getElementById('sizeSlider');
+  const sizeValue   = document.getElementById('sizeValue');
+  const fontGrid    = document.getElementById('fontGrid');
+  const overlay     = document.getElementById('settingsOverlay');
+
+  // ── INIT ──
+  function init() {
+    setDate();
+    buildFontGrid();
+    applyFont(currentFont);
+    applySize(currentSize);
+
+    const saved = localStorage.getItem('ms_strategy') || '';
+    textarea.value = saved;
+    updateWordCount();
+
+    textarea.addEventListener('input', () => {
+      localStorage.setItem('ms_strategy', textarea.value);
+      updateWordCount();
+    });
+
+    // Update slider fill on load
+    updateSliderFill(sizeSlider);
+  }
+
+  function setDate() {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+    dateLabel.textContent = 'Strategy for ' + tomorrow.toLocaleDateString('en-GB', opts);
+  }
+
+  function updateWordCount() {
+    const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0);
+    const count = textarea.value.trim() === '' ? 0 : words.length;
+    charCount.textContent = count === 1 ? '1 word' : count + ' words';
+  }
+
+  // ── FONT GRID ──
+  function buildFontGrid() {
+    fontGrid.innerHTML = '';
+    FONTS.forEach(f => {
+      const el = document.createElement('div');
+      el.className = 'font-option' + (f.id === currentFont ? ' active' : '');
+      el.innerHTML = `<div class="font-name">${f.name}</div><div class="font-preview" style="font-family:${f.family}">${f.preview}</div>`;
+      el.addEventListener('click', () => selectFont(f.id));
+      fontGrid.appendChild(el);
+    });
+  }
+
+  function selectFont(id) {
+    currentFont = id;
+    localStorage.setItem('ms_font', id);
+    applyFont(id);
+    document.querySelectorAll('.font-option').forEach((el, i) => {
+      el.classList.toggle('active', FONTS[i].id === id);
+    });
+  }
+
+  function applyFont(id) {
+    const f = FONTS.find(x => x.id === id) || FONTS[0];
+    document.documentElement.style.setProperty('--font', f.family);
+  }
+
+  // ── SIZE ──
+  function onSizeChange(slider) {
+    currentSize = parseInt(slider.value);
+    localStorage.setItem('ms_size', currentSize);
+    applySize(currentSize);
+    updateSliderFill(slider);
+  }
+
+  function applySize(size) {
+    document.documentElement.style.setProperty('--font-size', size + 'px');
+    sizeSlider.value = size;
+    sizeValue.textContent = size + 'px';
+    updateSliderFill(sizeSlider);
+  }
+
+  function updateSliderFill(slider) {
+    const min = parseInt(slider.min);
+    const max = parseInt(slider.max);
+    const val = parseInt(slider.value);
+    const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+    slider.style.setProperty('--pct', pct);
+  }
+
+  // ── SETTINGS PANEL ──
+  function openSettings() {
+    overlay.classList.add('open');
+  }
+
+  function closeSettings() {
+    overlay.classList.remove('open');
+  }
+
+  // Prevent body scroll when textarea scrolls
+  textarea.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+
+  init();
+</script>
+</body>
+</html>
