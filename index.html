@@ -1558,27 +1558,37 @@ document.addEventListener('keydown',e=>{
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {
   render();
-  if (ghConfigured()) {
-    try {
-      const data = await ghFetch();
-      if (data) {
-        const ids   = new Set(reminders.map(r=>r.id));
-        const fresh = data.filter(r=>!ids.has(r.id));
-        // Merge done states for existing reminders too
-        data.forEach(remote => {
-          const local = reminders.find(r=>r.id===remote.id);
-          if (local && local.done !== remote.done) local.done = remote.done;
-        });
-        if (fresh.length > 0) reminders = [...fresh, ...reminders];
-        // Merge groups and names from pulled data
-        data.forEach(r=>{
-          if(r.group  && !groups.includes(r.group))  groups.push(r.group);
-          if(r.author && !names.includes(r.author))  names.push(r.author);
-        });
-        save(); saveGroups(); saveNames(); render();
-        if (fresh.length > 0) toast(`Pulled ${fresh.length} new reminder${fresh.length!==1?'s':''} ✓`);
-      }
-    } catch(e) { console.warn('GitHub pull failed', e); }
+  if (!ghConfigured()) return;
+
+  try {
+    const data = await ghFetch();
+    if (!data) return;
+
+    // GitHub is the master copy — start from it
+    // Keep anything local that GitHub doesn't have yet (added offline)
+    const ghIds = new Set(data.map(r=>r.id));
+    const localOnly = reminders.filter(r=>!ghIds.has(r.id));
+
+    // Build full list: GitHub data + anything added locally but not yet pushed
+    reminders = [...localOnly, ...data];
+
+    // Merge groups and names
+    data.forEach(r=>{
+      if(r.group  && !groups.includes(r.group))  groups.push(r.group);
+      if(r.author && !names.includes(r.author))  names.push(r.author);
+    });
+
+    save(); saveGroups(); saveNames(); render();
+
+    // If we had local-only items, push them up now
+    if (localOnly.length > 0) {
+      await ghPushAll();
+      toast(`Synced ${localOnly.length} local reminder${localOnly.length!==1?'s':''} to GitHub ✓`);
+    }
+
+  } catch(e) {
+    console.warn('GitHub pull failed on load', e);
+    // Fall back to whatever is in localStorage silently
   }
 }
 
