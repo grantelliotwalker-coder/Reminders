@@ -571,6 +571,70 @@
     transform: scale(0.98);
   }
 
+  /* ── CLEAR BUTTON ── */
+  .clear-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(201,168,76,0.5);
+    background: rgba(10,10,10,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    z-index: 10;
+    flex-shrink: 0;
+    backdrop-filter: blur(4px);
+  }
+
+  .clear-btn.visible {
+    opacity: 0.5;
+    pointer-events: all;
+  }
+
+  .clear-btn:active {
+    transform: scale(0.88);
+    opacity: 0.9 !important;
+  }
+
+  .clear-btn svg {
+    width: 12px;
+    height: 12px;
+    stroke: var(--gold-light);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  /* ── DESKTOP: full width ── */
+  @media (min-width: 600px) {
+    html, body {
+      overflow: auto;
+    }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      touch-action: auto;
+    }
+    .header {
+      max-width: 100%;
+    }
+    .card-wrap {
+      max-width: 100%;
+      padding: 8px 32px 32px;
+    }
+    .settings-sheet {
+      max-width: 520px;
+      margin: 0 auto;
+      border-radius: 24px 24px 0 0;
+    }
+  }
+
   /* Safe area */
   @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .card-wrap { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
@@ -632,6 +696,12 @@
         <div class="divider"></div>
       </div>
       <div class="strategy-area">
+        <button class="clear-btn" id="clearBtn" aria-label="Clear text">
+          <svg viewBox="0 0 14 14" fill="none">
+            <line x1="2" y1="2" x2="12" y2="12"/>
+            <line x1="12" y1="2" x2="2" y2="12"/>
+          </svg>
+        </button>
         <textarea
           class="strategy-textarea"
           id="strategyText"
@@ -693,6 +763,7 @@
   const sizeValue   = document.getElementById('sizeValue');
   const fontGrid    = document.getElementById('fontGrid');
   const overlay     = document.getElementById('settingsOverlay');
+  const clearBtn    = document.getElementById('clearBtn');
 
   // ── INIT ──
   function init() {
@@ -704,10 +775,18 @@
     const saved = localStorage.getItem('ms_strategy') || '';
     textarea.value = saved;
     updateWordCount();
+    updateClearBtn();
+
+    clearBtn.addEventListener('click', () => {
+      textarea.value = '';
+      localStorage.setItem('ms_strategy', '');
+      updateWordCount();
+      updateClearBtn();
+      textarea.focus();
+    });
 
     textarea.addEventListener('input', () => {
-      localStorage.setItem('ms_strategy', textarea.value);
-      updateWordCount();
+      // handled by the mode-aware input listener below
     });
 
     updateModeUI();
@@ -729,6 +808,11 @@
     const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0);
     const count = textarea.value.trim() === '' ? 0 : words.length;
     charCount.textContent = count === 1 ? '1 word' : count + ' words';
+    updateClearBtn();
+  }
+
+  function updateClearBtn() {
+    clearBtn.classList.toggle('visible', textarea.value.length > 0);
   }
 
   // ── FONT GRID ──
@@ -815,10 +899,22 @@
     });
   }
 
+  // Renumber all numbered lines sequentially
+  function renumberLines(value) {
+    const lines = value.split('\n');
+    let counter = 1;
+    return lines.map(line => {
+      if (/^\d+\.\s/.test(line)) {
+        return line.replace(/^\d+\.(\s)/, counter++ + '.$1');
+      }
+      return line;
+    }).join('\n');
+  }
+
   // Handle Enter key for list modes
   textarea.addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
     if (currentMode === 'none') return;
+    if (e.key !== 'Enter') return;
 
     e.preventDefault();
     const { selectionStart, selectionEnd, value } = textarea;
@@ -826,7 +922,6 @@
     if (currentMode === 'bullet') {
       const lines = value.substring(0, selectionStart).split('\n');
       const currentLine = lines[lines.length - 1];
-      // If line is just a bullet, remove it (exit list)
       if (currentLine.trim() === '•') {
         const newVal = value.substring(0, selectionStart - currentLine.length) + value.substring(selectionEnd);
         textarea.value = newVal;
@@ -840,7 +935,6 @@
       const lines = value.substring(0, selectionStart).split('\n');
       const currentLine = lines[lines.length - 1];
       const match = currentLine.match(/^(\d+)\.\s/);
-      // If line is just a number, exit list
       if (match && currentLine.trim() === match[0].trim()) {
         const newVal = value.substring(0, selectionStart - currentLine.length) + value.substring(selectionEnd);
         textarea.value = newVal;
@@ -855,6 +949,24 @@
 
     localStorage.setItem('ms_strategy', textarea.value);
     updateWordCount();
+  });
+
+  // Auto-renumber after any change in number mode
+  textarea.addEventListener('input', () => {
+    if (currentMode === 'number') {
+      const pos = textarea.selectionStart;
+      const before = textarea.value.substring(0, pos);
+      const renumbered = renumberLines(textarea.value);
+      if (renumbered !== textarea.value) {
+        // Figure out how many chars changed before cursor
+        const renumberedBefore = renumberLines(before + '|').replace('|','');
+        textarea.value = renumbered;
+        textarea.selectionStart = textarea.selectionEnd = renumberedBefore.length;
+      }
+    }
+    localStorage.setItem('ms_strategy', textarea.value);
+    updateWordCount();
+    updateClearBtn();
   });
 
   // Auto-prefix first line when mode is active and box is empty
