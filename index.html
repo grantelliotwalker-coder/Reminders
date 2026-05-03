@@ -3,284 +3,889 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Launcher</title>
+<title>Morning Strategise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=DM+Serif+Display:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
-  /* ============================================================
-     EASY CUSTOMISATION
-     - Set enabled: true/false to show/hide a button
-     - Set label to what appears on the button
-     - Set url to where it should navigate
-  ============================================================ */
-
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap');
-
-  :root {
-    --bg:        #0a0a0a;
-    --surface:   #111111;
-    --border:    rgba(255,255,255,0.07);
-    --blue-a:    #3b82f6;
-    --blue-b:    #6366f1;
-    --blue-c:    #06b6d4;
-    --text:      #f1f5f9;
-    --muted:     #64748b;
-    --btn-h:     52px;
-    --cols:      2;
-    --gap:       10px;
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #8B6914;
+    --gold-pale: #F5E6B8;
+    --black: #0A0A0A;
+    --font: 'Cormorant Garamond', serif;
+    --font-size: 17px;
+  }
 
   html, body {
     height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    width: 100%;
+    overflow: hidden;
+    background: var(--black);
+    font-family: var(--font);
     -webkit-font-smoothing: antialiased;
-    overscroll-behavior: none;
+    touch-action: none;
   }
 
   body {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
     min-height: 100dvh;
-    padding: env(safe-area-inset-top, 12px) env(safe-area-inset-right, 16px) env(safe-area-inset-bottom, 16px) env(safe-area-inset-left, 16px);
-    padding-top: max(env(safe-area-inset-top), 16px);
-  }
-
-  header {
-    padding: 8px 4px 14px;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-  }
-
-  header h1 {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  header span {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--blue-a);
-    box-shadow: 0 0 8px var(--blue-a);
-    display: inline-block;
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.3; }
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(var(--cols), 1fr);
-    gap: var(--gap);
-    flex: 1;
-    align-content: start;
-  }
-
-  /* ── BUTTON BASE ── */
-  .btn {
-    display: none; /* hidden by default — set enabled:true to show */
+    padding: 0;
     position: relative;
-    height: var(--btn-h);
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    overflow: hidden;
-    text-decoration: none;
+  }
+
+  /* Subtle background grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    width: 100%;
+    display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: 0.01em;
-    background: linear-gradient(135deg, var(--blue-a), var(--blue-b));
-    box-shadow:
-      0 0 0 1px rgba(99,102,241,0.3),
-      0 4px 16px rgba(59,130,246,0.25),
-      inset 0 1px 0 rgba(255,255,255,0.15);
-    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    padding: 28px 20px 20px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--gold-dim) 0%, var(--gold-light) 40%, var(--gold) 60%, var(--gold-pale) 80%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 12px rgba(201,168,76,0.3));
+    line-height: 1;
     user-select: none;
   }
 
-  .btn.enabled {
-    display: flex; /* shown when enabled */
+  .logo span {
+    font-style: italic;
+    font-size: 0.85em;
+    letter-spacing: 0.22em;
   }
 
-  /* shine overlay */
-  .btn::before {
-    content: '';
+  /* ── MODE BUTTON ── */
+  .mode-btn {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 60%);
-    border-radius: inherit;
-    pointer-events: none;
+    left: 18px;
+    top: 26px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
   }
 
-  /* subtle animated gradient shimmer */
-  .btn::after {
-    content: '';
+  .mode-btn:active {
+    background: rgba(201,168,76,0.18);
+    border-color: rgba(201,168,76,0.6);
+    transform: scale(0.93);
+  }
+
+  .mode-btn svg {
+    width: 17px;
+    height: 17px;
+    stroke: var(--gold);
+    opacity: 0.8;
+  }
+
+  /* ── MODE POPUP ── */
+  .mode-popup {
+    position: fixed;
+    top: 80px;
+    left: 18px;
+    z-index: 200;
+    background: linear-gradient(160deg, #181508, #110f07);
+    border: 1px solid rgba(201,168,76,0.28);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.06);
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 170px;
+    transform-origin: top left;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), opacity 0.18s ease;
+  }
+
+  .mode-popup.open {
+    display: flex;
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .mode-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    touch-action: manipulation;
+  }
+
+  .mode-option:active,
+  .mode-option.active {
+    background: rgba(201,168,76,0.12);
+  }
+
+  .mode-option.active .mode-icon {
+    opacity: 1;
+    color: var(--gold-light);
+  }
+
+  .mode-option.active .mode-label {
+    color: var(--gold-light);
+  }
+
+  .mode-icon {
+    font-size: 16px;
+    opacity: 0.55;
+    color: var(--gold);
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+    font-family: monospace;
+    font-style: normal;
+    line-height: 1;
+  }
+
+  .mode-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: rgba(245,230,184,0.65);
+    line-height: 1;
+  }
+
+  .mode-divider {
+    height: 1px;
+    background: rgba(201,168,76,0.12);
+    margin: 2px 0;
+  }
+
+  /* ── SETTINGS BUTTON ── */
+  .settings-btn {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%);
-    border-radius: inherit;
-    transform: translateX(-100%);
-    transition: transform 0s;
+    right: 18px;
+    top: 26px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
   }
 
-  .btn:hover::after { transform: translateX(100%); transition: transform 0.45s ease; }
+  .settings-btn:active {
+    background: rgba(201,168,76,0.18);
+    border-color: rgba(201,168,76,0.6);
+    transform: scale(0.93);
+  }
 
-  .btn:active {
-    transform: scale(0.96);
-    filter: brightness(1.15);
+  .settings-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--gold);
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  /* ── MAIN CARD ── */
+  .card-wrap {
+    flex: 1;
+    width: 100%;
+    padding: 8px 16px 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    z-index: 1;
+  }
+
+  .card {
+    flex: 1;
+    border-radius: 28px;
+    padding: 2px;
+    background: linear-gradient(145deg,
+      rgba(201,168,76,0.7) 0%,
+      rgba(232,201,122,0.4) 20%,
+      rgba(139,105,20,0.3) 40%,
+      rgba(201,168,76,0.5) 60%,
+      rgba(245,230,184,0.5) 80%,
+      rgba(201,168,76,0.6) 100%
+    );
     box-shadow:
-      0 0 0 1px rgba(99,102,241,0.5),
-      0 2px 8px rgba(59,130,246,0.4),
-      inset 0 1px 0 rgba(255,255,255,0.15);
+      0 0 40px rgba(201,168,76,0.12),
+      0 20px 60px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(245,230,184,0.3);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
   }
 
-  /* colour variants — alternate so the grid looks varied */
-  .btn:nth-child(3n+1) { background: linear-gradient(135deg, #3b82f6, #6366f1); }
-  .btn:nth-child(3n+2) { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
-  .btn:nth-child(3n)   { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+  .card-inner {
+    flex: 1;
+    border-radius: 26px;
+    background: linear-gradient(160deg,
+      #111008 0%,
+      #0e0d08 30%,
+      #0c0b06 60%,
+      #100f09 100%
+    );
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    min-height: 0;
+  }
 
-  /* wide button — spans both columns */
-  .btn.wide { grid-column: 1 / -1; }
+  /* Gold shimmer overlay */
+  .card-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(180deg, rgba(201,168,76,0.06) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 26px 26px 0 0;
+  }
 
-  .btn-label {
+  /* ── DATE STRIP ── */
+  .date-strip {
+    padding: 14px 22px 8px;
+    flex-shrink: 0;
     position: relative;
     z-index: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 90%;
+  }
+
+  .date-label {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.5;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.15) 70%, transparent);
+    margin: 8px 0 0;
+  }
+
+  /* ── TEXTAREA ── */
+  .strategy-area {
+    flex: 1;
+    padding: 16px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .strategy-textarea {
+    flex: 1;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: rgba(245,230,184,0.88);
+    font-family: var(--font);
+    font-size: var(--font-size);
+    font-weight: 300;
+    line-height: 1.75;
+    letter-spacing: 0.01em;
+    caret-color: var(--gold-light);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201,168,76,0.2) transparent;
+    touch-action: pan-y;
+  }
+
+  .strategy-textarea::-webkit-scrollbar {
+    width: 3px;
+  }
+  .strategy-textarea::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .strategy-textarea::-webkit-scrollbar-thumb {
+    background: rgba(201,168,76,0.25);
+    border-radius: 2px;
+  }
+
+  .strategy-textarea::placeholder {
+    color: rgba(201,168,76,0.22);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  /* ── CHAR COUNT ── */
+  .char-count {
+    flex-shrink: 0;
+    text-align: right;
+    font-family: 'DM Serif Display', serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: rgba(201,168,76,0.28);
+    padding-top: 6px;
+    user-select: none;
+  }
+
+  /* ── SETTINGS PANEL ── */
+  .settings-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .settings-overlay.open {
+    pointer-events: all;
+    opacity: 1;
+  }
+
+  .settings-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+  }
+
+  .settings-sheet {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(170deg, #141209 0%, #0e0c07 100%);
+    border-top: 1px solid rgba(201,168,76,0.3);
+    border-radius: 24px 24px 0 0;
+    padding: 0 24px 40px;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.8);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .settings-overlay.open .settings-sheet {
+    transform: translateY(0);
+  }
+
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(201,168,76,0.25);
+    margin: 12px auto 20px;
+  }
+
+  .sheet-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-bottom: 20px;
+  }
+
+  .section-label {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(201,168,76,0.45);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  /* Font options */
+  .font-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .font-option {
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(201,168,76,0.03);
+    touch-action: manipulation;
+  }
+
+  .font-option:active {
+    transform: scale(0.97);
+  }
+
+  .font-option.active {
+    border-color: rgba(201,168,76,0.55);
+    background: rgba(201,168,76,0.1);
+    box-shadow: 0 0 16px rgba(201,168,76,0.08);
+  }
+
+  .font-name {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgba(201,168,76,0.45);
+    margin-bottom: 4px;
+  }
+
+  .font-option.active .font-name {
+    color: rgba(201,168,76,0.7);
+  }
+
+  .font-preview {
+    font-size: 18px;
+    color: rgba(245,230,184,0.75);
+    line-height: 1.2;
+  }
+
+  /* Font size slider */
+  .size-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .size-label-small {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    color: rgba(201,168,76,0.4);
+    flex-shrink: 0;
+    width: 20px;
     text-align: center;
   }
 
-  footer {
-    padding: 10px 4px 2px;
+  .size-label-large {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: rgba(201,168,76,0.4);
+    flex-shrink: 0;
+    width: 24px;
     text-align: center;
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    color: #2a2a2a;
-    letter-spacing: 0.08em;
+  }
+
+  .size-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold) var(--pct, 40%), rgba(201,168,76,0.15) var(--pct, 40%));
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, var(--gold-light), var(--gold));
+    box-shadow: 0 0 10px rgba(201,168,76,0.4);
+    cursor: pointer;
+  }
+
+  .size-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 12px;
+    color: rgba(201,168,76,0.5);
+    flex-shrink: 0;
+    width: 34px;
+    text-align: right;
+  }
+
+  /* Close btn */
+  .close-btn {
+    width: 100%;
+    margin-top: 22px;
+    padding: 15px;
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 14px;
+    background: rgba(201,168,76,0.06);
+    color: var(--gold);
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+  }
+
+  .close-btn:active {
+    background: rgba(201,168,76,0.14);
+    transform: scale(0.98);
+  }
+
+  /* Safe area */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .card-wrap { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+    .settings-sheet { padding-bottom: max(40px, env(safe-area-inset-bottom)); }
+    .header { padding-top: max(28px, calc(env(safe-area-inset-top) + 14px)); }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <span></span>
-  <h1>Launcher</h1>
-</header>
-
-<!-- ============================================================
-     BUTTONS — edit these to customise your launcher
-     
-     To show a button:     add class "enabled"
-     To make it full-width: add class "wide"
-     Set href=""           to the URL you want
-     Edit the text inside  <span class="btn-label"> for the label
-     
-     Examples:
-       <a class="btn enabled" href="https://example.com">
-       <a class="btn enabled wide" href="https://example.com">
-============================================================ -->
-
-<div class="grid">
-
-  <!-- Button 1 -->
-  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/Reminders/">
-    <span class="btn-label">Reminders App</span>
-  </a>
-
-  <!-- Button 2 -->
-  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/Reminders/morning-strategise.html">
-    <span class="btn-label">Morning Strategise</span>
-  </a>
-
-  <!-- Button 3 -->
-  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/FoodTracker/#home">
-    <span class="btn-label">Food Tracker</span>
-  </a>
-
-  <!-- Button 4 -->
-  <a class="btn enabled" href="https://budgetneedsvswants.com/index.html">
-    <span class="btn-label">Needs VS Wants</span>
-  </a>
-
-  <!-- Button 5 -->
-  <a class="btn enabled" href="https://lyricflow-scroller.com/index.html">
-    <span class="btn-label">Lyric Flow</span>
-  </a>
-
-  <!-- Button 6 -->
-  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/Grants-Website/Home.html">
-    <span class="btn-label">Grant Music</span>
-  </a>
-
-  <!-- Button 7 -->
-  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/simply-health/index.html">
-    <span class="btn-label">Simply Health</span>
-  </a>
-
-  <!-- Button 8 -->
-  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/Greenroom-Electrical/Home.html">
-    <span class="btn-label">Greenroom Electrical</span>
-  </a>
-
-  <!-- Button 9 -->
-  <a class="btn" href="">
-    <span class="btn-label">Button 9</span>
-  </a>
-
-  <!-- Button 10 -->
-  <a class="btn" href="">
-    <span class="btn-label">Button 10</span>
-  </a>
-
-  <!-- Button 11 -->
-  <a class="btn" href="">
-    <span class="btn-label">Button 11</span>
-  </a>
-
-  <!-- Button 12 -->
-  <a class="btn" href="">
-    <span class="btn-label">Button 12</span>
-  </a>
-
-  <!-- Button 13 -->
-  <a class="btn" href="">
-    <span class="btn-label">Button 13</span>
-  </a>
-
-  <!-- Button 14 -->
-  <a class="btn" href="">
-    <span class="btn-label">Button 14</span>
-  </a>
-
-  <!-- Button 15 -->
-  <a class="btn" href="">
-    <span class="btn-label">Button 15</span>
-  </a>
-
-  <!-- Button 16 -->
-  <a class="btn" href="">
-    <span class="btn-label">Button 16</span>
-  </a>
-
+<!-- Mode Popup -->
+<div class="mode-popup" id="modePopup">
+  <div class="mode-option" id="modeNone" onclick="setMode('none')">
+    <span class="mode-icon">¶</span>
+    <span class="mode-label">Free Write</span>
+  </div>
+  <div class="mode-divider"></div>
+  <div class="mode-option" id="modeBullet" onclick="setMode('bullet')">
+    <span class="mode-icon">•</span>
+    <span class="mode-label">Bullet Points</span>
+  </div>
+  <div class="mode-divider"></div>
+  <div class="mode-option" id="modeNumber" onclick="setMode('number')">
+    <span class="mode-icon">1.</span>
+    <span class="mode-label">Numbered List</span>
+  </div>
 </div>
 
-<footer>launcher · edit html to configure</footer>
+<!-- Header -->
+<div class="header">
+  <div class="logo">Morning <span>Strategise</span></div>
 
+  <!-- Mode Button -->
+  <button class="mode-btn" onclick="toggleModePopup()" aria-label="List mode">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="8" y1="6" x2="21" y2="6"/>
+      <line x1="8" y1="12" x2="21" y2="12"/>
+      <line x1="8" y1="18" x2="21" y2="18"/>
+      <circle cx="3" cy="6" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="3" cy="12" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="3" cy="18" r="1" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
+
+  <button class="settings-btn" onclick="openSettings()" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Main Card -->
+<div class="card-wrap">
+  <div class="card">
+    <div class="card-inner">
+      <div class="date-strip">
+        <div class="date-label" id="dateLabel"></div>
+        <div class="divider"></div>
+      </div>
+      <div class="strategy-area">
+        <textarea
+          class="strategy-textarea"
+          id="strategyText"
+          placeholder="Write your strategy for tomorrow…"
+          spellcheck="true"
+          autocorrect="on"
+          autocapitalize="sentences"
+        ></textarea>
+        <div class="char-count" id="charCount">0 words</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Panel -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-backdrop" onclick="closeSettings()"></div>
+  <div class="settings-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Preferences</div>
+
+    <div class="section-label">Typeface</div>
+    <div class="font-grid" id="fontGrid">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="section-label">Size</div>
+    <div class="size-row">
+      <span class="size-label-small">A</span>
+      <input type="range" class="size-slider" id="sizeSlider" min="13" max="24" value="17" oninput="onSizeChange(this)">
+      <span class="size-label-large">A</span>
+      <span class="size-value" id="sizeValue">17px</span>
+    </div>
+
+    <button class="close-btn" onclick="closeSettings()">Done</button>
+  </div>
+</div>
+
+<script>
+  // ── DATA ──
+  const FONTS = [
+    { id: 'cormorant', name: 'Cormorant', family: "'Cormorant Garamond', serif", preview: 'Strategy' },
+    { id: 'playfair',  name: 'Playfair',  family: "'Playfair Display', serif",   preview: 'Strategy' },
+    { id: 'lora',      name: 'Lora',      family: "'Lora', serif",               preview: 'Strategy' },
+    { id: 'baskerville', name: 'Baskerville', family: "'Libre Baskerville', serif", preview: 'Strategy' },
+    { id: 'spectral',  name: 'Spectral',  family: "'Spectral', serif",           preview: 'Strategy' },
+    { id: 'crimson',   name: 'Crimson',   family: "'Crimson Pro', serif",        preview: 'Strategy' },
+  ];
+
+  // ── STATE ──
+  let currentFont = localStorage.getItem('ms_font') || 'cormorant';
+  let currentSize = parseInt(localStorage.getItem('ms_size') || '17');
+
+  // ── ELEMENTS ──
+  const textarea    = document.getElementById('strategyText');
+  const charCount   = document.getElementById('charCount');
+  const dateLabel   = document.getElementById('dateLabel');
+  const sizeSlider  = document.getElementById('sizeSlider');
+  const sizeValue   = document.getElementById('sizeValue');
+  const fontGrid    = document.getElementById('fontGrid');
+  const overlay     = document.getElementById('settingsOverlay');
+
+  // ── INIT ──
+  function init() {
+    setDate();
+    buildFontGrid();
+    applyFont(currentFont);
+    applySize(currentSize);
+
+    const saved = localStorage.getItem('ms_strategy') || '';
+    textarea.value = saved;
+    updateWordCount();
+
+    textarea.addEventListener('input', () => {
+      localStorage.setItem('ms_strategy', textarea.value);
+      updateWordCount();
+    });
+
+    updateModeUI();
+    modePopup.style.display = 'none';
+
+    // Update slider fill on load
+    updateSliderFill(sizeSlider);
+  }
+
+  function setDate() {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+    dateLabel.textContent = 'Strategy for ' + tomorrow.toLocaleDateString('en-GB', opts);
+  }
+
+  function updateWordCount() {
+    const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0);
+    const count = textarea.value.trim() === '' ? 0 : words.length;
+    charCount.textContent = count === 1 ? '1 word' : count + ' words';
+  }
+
+  // ── FONT GRID ──
+  function buildFontGrid() {
+    fontGrid.innerHTML = '';
+    FONTS.forEach(f => {
+      const el = document.createElement('div');
+      el.className = 'font-option' + (f.id === currentFont ? ' active' : '');
+      el.innerHTML = `<div class="font-name">${f.name}</div><div class="font-preview" style="font-family:${f.family}">${f.preview}</div>`;
+      el.addEventListener('click', () => selectFont(f.id));
+      fontGrid.appendChild(el);
+    });
+  }
+
+  function selectFont(id) {
+    currentFont = id;
+    localStorage.setItem('ms_font', id);
+    applyFont(id);
+    document.querySelectorAll('.font-option').forEach((el, i) => {
+      el.classList.toggle('active', FONTS[i].id === id);
+    });
+  }
+
+  function applyFont(id) {
+    const f = FONTS.find(x => x.id === id) || FONTS[0];
+    document.documentElement.style.setProperty('--font', f.family);
+  }
+
+  // ── SIZE ──
+  function onSizeChange(slider) {
+    currentSize = parseInt(slider.value);
+    localStorage.setItem('ms_size', currentSize);
+    applySize(currentSize);
+    updateSliderFill(slider);
+  }
+
+  function applySize(size) {
+    document.documentElement.style.setProperty('--font-size', size + 'px');
+    sizeSlider.value = size;
+    sizeValue.textContent = size + 'px';
+    updateSliderFill(sizeSlider);
+  }
+
+  function updateSliderFill(slider) {
+    const min = parseInt(slider.min);
+    const max = parseInt(slider.max);
+    const val = parseInt(slider.value);
+    const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+    slider.style.setProperty('--pct', pct);
+  }
+
+  // ── MODE ──
+  let currentMode = localStorage.getItem('ms_mode') || 'none';
+  const modePopup = document.getElementById('modePopup');
+
+  function toggleModePopup() {
+    const isOpen = modePopup.classList.contains('open');
+    if (isOpen) {
+      closeModePopup();
+    } else {
+      modePopup.style.display = 'flex';
+      requestAnimationFrame(() => modePopup.classList.add('open'));
+      updateModeUI();
+    }
+  }
+
+  function closeModePopup() {
+    modePopup.classList.remove('open');
+    setTimeout(() => { if (!modePopup.classList.contains('open')) modePopup.style.display = 'none'; }, 200);
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    localStorage.setItem('ms_mode', mode);
+    updateModeUI();
+    closeModePopup();
+    textarea.focus();
+  }
+
+  function updateModeUI() {
+    ['none','bullet','number'].forEach(m => {
+      document.getElementById('mode' + m.charAt(0).toUpperCase() + m.slice(1))
+        .classList.toggle('active', m === currentMode);
+    });
+  }
+
+  // Handle Enter key for list modes
+  textarea.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (currentMode === 'none') return;
+
+    e.preventDefault();
+    const { selectionStart, selectionEnd, value } = textarea;
+
+    if (currentMode === 'bullet') {
+      const lines = value.substring(0, selectionStart).split('\n');
+      const currentLine = lines[lines.length - 1];
+      // If line is just a bullet, remove it (exit list)
+      if (currentLine.trim() === '•') {
+        const newVal = value.substring(0, selectionStart - currentLine.length) + value.substring(selectionEnd);
+        textarea.value = newVal;
+        textarea.selectionStart = textarea.selectionEnd = selectionStart - currentLine.length;
+      } else {
+        const insert = '\n• ';
+        textarea.value = value.substring(0, selectionStart) + insert + value.substring(selectionEnd);
+        textarea.selectionStart = textarea.selectionEnd = selectionStart + insert.length;
+      }
+    } else if (currentMode === 'number') {
+      const lines = value.substring(0, selectionStart).split('\n');
+      const currentLine = lines[lines.length - 1];
+      const match = currentLine.match(/^(\d+)\.\s/);
+      // If line is just a number, exit list
+      if (match && currentLine.trim() === match[0].trim()) {
+        const newVal = value.substring(0, selectionStart - currentLine.length) + value.substring(selectionEnd);
+        textarea.value = newVal;
+        textarea.selectionStart = textarea.selectionEnd = selectionStart - currentLine.length;
+      } else {
+        const nextNum = match ? parseInt(match[1]) + 1 : 1;
+        const insert = '\n' + nextNum + '. ';
+        textarea.value = value.substring(0, selectionStart) + insert + value.substring(selectionEnd);
+        textarea.selectionStart = textarea.selectionEnd = selectionStart + insert.length;
+      }
+    }
+
+    localStorage.setItem('ms_strategy', textarea.value);
+    updateWordCount();
+  });
+
+  // Auto-prefix first line when mode is active and box is empty
+  textarea.addEventListener('focus', () => {
+    if (textarea.value === '' && currentMode !== 'none') {
+      if (currentMode === 'bullet') textarea.value = '• ';
+      if (currentMode === 'number') textarea.value = '1. ';
+      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+    }
+  });
+
+  // Close mode popup when tapping outside
+  document.addEventListener('click', e => {
+    if (!modePopup.contains(e.target) && !e.target.closest('.mode-btn')) {
+      closeModePopup();
+    }
+  });
+
+  
+  function openSettings() {
+    overlay.classList.add('open');
+  }
+
+  function closeSettings() {
+    overlay.classList.remove('open');
+  }
+
+  // Prevent body scroll when textarea scrolls
+  textarea.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+
+  init();
+</script>
 </body>
 </html>
