@@ -2,1597 +2,285 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Reminders</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Launcher</title>
 <style>
-*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  /* ============================================================
+     EASY CUSTOMISATION
+     - Set enabled: true/false to show/hide a button
+     - Set label to what appears on the button
+     - Set url to where it should navigate
+  ============================================================ */
 
-:root {
-  --bg:      #0d1117;
-  --surface: #161b22;
-  --surface2:#1c2230;
-  --surface3:#232c3d;
-  --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --text:    #e6edf3;
-  --muted:   #6e7f96;
-  --accent:  #00c8d4;
-  --accent2: #00e5f0;
-  --red:     #ff4d6d;
-  --yellow:  #f7c948;
-  --green:   #3dd68c;
-  --header-h:62px;
-  --footer-h:50px;
-}
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap');
 
-html {
-  height: 100%;
-  overflow: hidden;
-}
-body {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Sora', sans-serif;
-  font-size: 15px;
-  -webkit-font-smoothing: antialiased;
-}
+  :root {
+    --bg:        #0a0a0a;
+    --surface:   #111111;
+    --border:    rgba(255,255,255,0.07);
+    --blue-a:    #3b82f6;
+    --blue-b:    #6366f1;
+    --blue-c:    #06b6d4;
+    --text:      #f1f5f9;
+    --muted:     #64748b;
+    --btn-h:     52px;
+    --cols:      2;
+    --gap:       10px;
+  }
 
-#app {
-  display: flex; flex-direction: column;
-  height: 100%; height: 100dvh;
-  width: 100%; max-width: 900px;
-  margin: 0 auto;
-  overflow: hidden;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── HEADER ── */
-header {
-  flex: 0 0 auto;
-  display: flex; align-items: center;
-  padding: env(safe-area-inset-top,0) 16px 0;
-  min-height: var(--header-h);
-  gap: 10px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(13,17,23,0.97);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  z-index: 10;
-  flex-shrink: 0;
-}
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
 
-#logo-btn {
-  display:flex; align-items:center; gap:10px;
-  background:none; border:none; cursor:pointer;
-  padding:6px 0; flex:1;
-}
-.logo-icon {
-  width:34px; height:34px;
-  background:var(--surface2);
-  border:1.5px solid var(--accent);
-  border-radius:9px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:17px; flex-shrink:0;
-  box-shadow:0 0 16px rgba(0,200,212,0.25);
-}
-.logo-text { font-size:16px; font-weight:800; color:var(--text); letter-spacing:0.3px; text-transform:uppercase; }
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    padding: env(safe-area-inset-top, 12px) env(safe-area-inset-right, 16px) env(safe-area-inset-bottom, 16px) env(safe-area-inset-left, 16px);
+    padding-top: max(env(safe-area-inset-top), 16px);
+  }
 
-.header-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  header {
+    padding: 8px 4px 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
 
+  header h1 {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
+  header span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--blue-a);
+    box-shadow: 0 0 8px var(--blue-a);
+    display: inline-block;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
 
-.pill-btn {
-  display:flex; align-items:center; gap:6px;
-  padding:8px 16px; border-radius:50px;
-  border:1.5px solid var(--border2);
-  background:var(--surface2);
-  color:var(--muted); font-size:13px; font-weight:600;
-  font-family:'Sora',sans-serif;
-  cursor:pointer; transition:all 0.15s; white-space:nowrap;
-}
-.pill-btn:active { transform:scale(0.93); }
-.pill-btn:hover  { border-color:var(--accent); color:var(--text); }
-.pill-btn.primary {
-  background:var(--accent); border-color:var(--accent);
-  color:#0d1117; font-weight:700;
-  box-shadow:0 0 16px rgba(0,200,212,0.35);
-}
-.pill-btn.primary:hover { background:var(--accent2); border-color:var(--accent2); }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
 
-/* ── MAIN ── */
-main {
-  flex: 1 1 0;
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  padding: 14px 13px 60px;
-  min-height: 0;
-}
-main::-webkit-scrollbar { width: 3px; }
-main::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: var(--gap);
+    flex: 1;
+    align-content: start;
+  }
 
-/* ── GROUP CARD ── */
-.group-card {
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:16px;
-  margin-bottom:12px;
-  overflow:visible;
-  flex-shrink:0;
-}
-.group-card-header {
-  display:flex; align-items:center;
-  padding:11px 12px 10px;
-  border-bottom:1px solid var(--border);
-  gap:8px;
-}
-.group-card-title { font-size:15px; font-weight:700; color:var(--text); flex:1; }
-.group-card-badge {
-  font-size:10px; font-weight:700;
-  padding:3px 9px; border-radius:20px;
-  background:var(--surface3); color:var(--accent);
-  font-family:'JetBrains Mono',monospace;
-  text-transform:uppercase; letter-spacing:0.5px;
-}
-.group-add-btn {
-  width:28px; height:28px; border-radius:50%;
-  background:var(--surface3); border:1.5px solid var(--border2);
-  color:var(--accent); font-size:18px; font-weight:300;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:all 0.15s; flex-shrink:0;
-  line-height:1;
-}
-.group-add-btn:hover  { background:var(--accent); color:#0d1117; border-color:var(--accent); }
-.group-add-btn:active { transform:scale(0.88); }
+  /* ── BUTTON BASE ── */
+  .btn {
+    display: none; /* hidden by default — set enabled:true to show */
+    position: relative;
+    height: var(--btn-h);
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    overflow: hidden;
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.01em;
+    background: linear-gradient(135deg, var(--blue-a), var(--blue-b));
+    box-shadow:
+      0 0 0 1px rgba(99,102,241,0.3),
+      0 4px 16px rgba(59,130,246,0.25),
+      inset 0 1px 0 rgba(255,255,255,0.15);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
 
-.group-pills { padding:8px 10px 10px; display:flex; flex-direction:column; gap:7px; }
-.group-card.general-card { background:transparent; border-color:transparent; }
-.group-card.general-card .group-card-header { display:none; }
-.group-card.general-card .group-pills { padding:0 0 12px; }
+  .btn.enabled {
+    display: flex; /* shown when enabled */
+  }
 
-/* ── REMINDER PILL ── */
-.reminder-pill {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 12px; border-radius:50px;
-  background:var(--surface2); border:1.5px solid var(--border2);
-  animation:slideIn 0.18s ease;
-  transition:opacity 0.25s, border-color 0.15s, box-shadow 0.15s;
-  cursor:pointer;
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
-}
-@keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-.reminder-pill.done { opacity:0.35; }
-.reminder-pill.done .pill-title { text-decoration:line-through; }
-.reminder-pill.selected {
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(0,200,212,0.18);
-}
+  /* shine overlay */
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
 
-.pill-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-.pill-check {
-  width:24px; height:24px; border-radius:50%;
-  border:2px solid var(--pill-color, var(--accent));
-  flex-shrink:0;
-  display:flex; align-items:center; justify-content:center;
-  transition:background 0.15s; cursor:pointer;
-  font-size:11px; font-weight:700; color:transparent;
-}
-.pill-check:active { transform:scale(0.88); }
-.reminder-pill.done .pill-check { background:var(--pill-color); color:#fff; }
+  /* subtle animated gradient shimmer */
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%);
+    border-radius: inherit;
+    transform: translateX(-100%);
+    transition: transform 0s;
+  }
 
-.pill-body { flex:1; min-width:0; }
-.pill-title  { font-size:13px; font-weight:600; line-height:1.3; }
-.pill-note   { font-size:11px; color:var(--muted); line-height:1.4; margin-top:2px; }
-.pill-author { font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+  .btn:hover::after { transform: translateX(100%); transition: transform 0.45s ease; }
 
-.pill-delete {
-  background:none; border:none; color:var(--red);
-  cursor:pointer; font-size:17px; line-height:1;
-  padding:3px 5px; border-radius:50%;
-  transition:opacity 0.2s, background 0.15s;
-  flex-shrink:0; opacity:0; pointer-events:none;
-}
-.reminder-pill.done .pill-delete { opacity:1; pointer-events:all; }
-.pill-delete:hover { background:rgba(255,77,109,0.15); }
+  .btn:active {
+    transform: scale(0.96);
+    filter: brightness(1.15);
+    box-shadow:
+      0 0 0 1px rgba(99,102,241,0.5),
+      0 2px 8px rgba(59,130,246,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.15);
+  }
 
-/* ── EMPTY ── */
-#empty {
-  display:none; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:12px; opacity:0.4; text-align:center;
-  padding: 80px 20px;
-}
-#empty .em-icon { font-size:44px; }
-#empty p { font-size:14px; color:var(--muted); line-height:1.6; }
+  /* colour variants — alternate so the grid looks varied */
+  .btn:nth-child(3n+1) { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+  .btn:nth-child(3n+2) { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+  .btn:nth-child(3n)   { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
 
-/* ── FOOTER ── */
-footer {
-  flex: 0 0 var(--footer-h);
-  flex-shrink: 0;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 16px; border-top:1px solid var(--border);
-  background:rgba(13,17,23,0.97);
-}
-.footer-stat { font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
-.footer-actions { display:flex; gap:7px; }
-.footer-btn {
-  font-size:11px; font-weight:600; font-family:'Sora',sans-serif;
-  color:var(--muted); background:none;
-  border:1.5px solid var(--border2); border-radius:50px;
-  padding:5px 12px; cursor:pointer; transition:all 0.15s;
-}
-.footer-btn:hover  { color:var(--text); border-color:var(--accent); }
-.footer-btn:active { transform:scale(0.93); }
+  /* wide button — spans both columns */
+  .btn.wide { grid-column: 1 / -1; }
 
-/* ── MODAL ── */
-.modal-backdrop {
-  position:fixed; inset:0;
-  background:rgba(0,0,0,0.75);
-  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-  z-index:100; display:flex; align-items:flex-end; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity 0.2s;
-}
-.modal-backdrop.open { opacity:1; pointer-events:all; }
-.modal {
-  background:var(--surface); border:1px solid var(--border2);
-  border-radius:24px 24px 0 0;
-  width:100%; max-width:580px;
-  padding:0 0 env(safe-area-inset-bottom,16px);
-  transform:translateY(30px);
-  transition:transform 0.26s cubic-bezier(0.34,1.5,0.64,1);
-  max-height:92dvh; display:flex; flex-direction:column;
-}
-.modal-backdrop.open .modal { transform:translateY(0); }
-.modal-handle { width:38px; height:4px; background:var(--border2); border-radius:2px; margin:12px auto 0; flex-shrink:0; }
-.modal-header {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:15px 18px 12px; flex-shrink:0;
-}
-.modal-title { font-size:17px; font-weight:800; letter-spacing:0.2px; text-transform:uppercase; }
-.modal-close {
-  width:30px; height:30px; border-radius:50%;
-  background:var(--surface3); border:none; color:var(--muted);
-  font-size:15px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-}
-.modal-close:hover { color:var(--text); }
-.modal-body {
-  flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:0 18px 18px; display:flex; flex-direction:column; gap:16px;
-}
-.modal-body::-webkit-scrollbar { width:3px; }
-.modal-body::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
+  .btn-label {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90%;
+    text-align: center;
+  }
 
-/* ── FORM ── */
-.form-group label {
-  display:block; font-size:10px; font-weight:700;
-  text-transform:uppercase; letter-spacing:1px;
-  color:var(--muted); margin-bottom:8px;
-  font-family:'JetBrains Mono',monospace;
-}
-.form-input {
-  width:100%; background:var(--surface2);
-  border:1.5px solid var(--border2); border-radius:12px;
-  color:var(--text); font-family:'Sora',sans-serif;
-  font-size:14px; padding:11px 14px; outline:none;
-  transition:border-color 0.15s;
-  -webkit-appearance:none; appearance:none;
-}
-.form-input:focus { border-color:var(--accent); }
-.form-input.error { border-color:var(--red); }
-textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
-.form-error { font-size:11px; color:var(--red); margin-top:5px; display:none; }
-.form-error.show { display:block; }
-
-/* ── MODE TOGGLE ── */
-.mode-toggle {
-  display:flex; background:var(--surface2);
-  border-radius:16px; padding:4px; gap:4px;
-  border:1.5px solid var(--border2);
-}
-.mode-btn {
-  flex:1; padding:10px 8px; border-radius:12px;
-  border:none; background:transparent;
-  color:var(--muted); font-family:'Sora',sans-serif;
-  cursor:pointer; transition:all 0.15s;
-  text-align:center; line-height:1.3;
-}
-.mode-btn .mode-title {
-  font-size:13px; font-weight:700; display:block;
-}
-.mode-btn .mode-sub {
-  font-size:10px; font-weight:500; display:block; margin-top:2px; opacity:0.7;
-}
-.mode-btn.active { background:var(--surface3); }
-.mode-btn.active.out { color:var(--red); }
-.mode-btn.active.in  { color:var(--green); }
-
-/* ── SYNC ROW ── */
-.sync-row {
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  padding:12px 14px; background:var(--surface2);
-  border:1.5px solid var(--border2); border-radius:12px;
-}
-.sync-row.disabled { opacity:0.4; pointer-events:none; }
-.sync-label { display:flex; flex-direction:column; gap:3px; flex:1; min-width:0; }
-.sync-label-text { font-size:13px; font-weight:600; }
-.sync-label-sub  { font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
-
-/* toggle switch */
-.toggle-input { display:none; }
-.toggle-track {
-  width:44px; height:26px; border-radius:13px;
-  background:var(--surface3); border:1.5px solid var(--border2);
-  cursor:pointer; position:relative; transition:background 0.2s, border-color 0.2s;
-  flex-shrink:0;
-}
-.toggle-track.on { background:var(--accent); border-color:var(--accent); }
-.toggle-thumb {
-  position:absolute; top:3px; left:3px;
-  width:18px; height:18px; border-radius:50%;
-  background:#fff; transition:transform 0.2s;
-  box-shadow:0 1px 4px rgba(0,0,0,0.3);
-}
-.toggle-track.on .toggle-thumb { transform:translateX(18px); }
-
-/* ── GH TEST RESULT ── */
-#gh-test-result.ok  { background:rgba(61,214,140,0.1); border:1.5px solid var(--green); color:var(--green); }
-#gh-test-result.err { background:rgba(255,77,109,0.1); border:1.5px solid var(--red);   color:var(--red);   }
-
-/* ── FILTER ACTIVE BAR ── */
-#filter-bar-active {
-  flex: 0 0 auto;
-  flex-shrink: 0;
-  display:none;
-  align-items:center;
-  justify-content:space-between;
-  padding:7px 16px;
-  background:rgba(0,200,212,0.08);
-  border-bottom:1px solid rgba(0,200,212,0.25);
-  animation:slideDown 0.2s ease;
-}
-@keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-#filter-bar-active.visible { display:flex; }
-#filter-bar-label {
-  font-size:11px; font-weight:700;
-  color:var(--accent); font-family:'JetBrains Mono',monospace;
-  letter-spacing:0.5px;
-}
-#filter-bar-clear {
-  font-size:11px; font-weight:700;
-  color:var(--accent); background:rgba(0,200,212,0.15);
-  border:1.5px solid rgba(0,200,212,0.35); border-radius:50px;
-  padding:4px 12px; cursor:pointer; font-family:'Sora',sans-serif;
-  transition:all 0.15s;
-}
-#filter-bar-clear:hover  { background:rgba(0,200,212,0.28); }
-#filter-bar-clear:active { transform:scale(0.93); }
-
-/* ── FILTER BAR ── */
-.filter-section-label {
-  font-size:10px; font-weight:700; text-transform:uppercase;
-  letter-spacing:1px; color:var(--muted);
-  font-family:'JetBrains Mono',monospace; padding:4px 0 8px;
-}
-.filter-opt {
-  display:flex; align-items:center; gap:12px;
-  padding:11px 14px; background:var(--surface2);
-  border-radius:12px; cursor:pointer;
-  border:1.5px solid var(--border2); transition:all 0.15s;
-  margin-bottom:7px; user-select:none;
-}
-.filter-opt.selected-out { border-color:var(--red);   background:rgba(255,77,109,0.07); }
-.filter-opt.selected-in  { border-color:var(--green); background:rgba(61,214,140,0.07); }
-.filter-opt-dot  { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
-.filter-opt-name { font-size:14px; font-weight:600; flex:1; }
-.filter-opt-cnt  { font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
-.filter-opt-check {
-  width:20px; height:20px; border-radius:50%;
-  border:2px solid var(--border2);
-  display:flex; align-items:center; justify-content:center;
-  font-size:10px; font-weight:700; flex-shrink:0; transition:all 0.15s;
-}
-.filter-opt.selected-out .filter-opt-check { border-color:var(--red);   background:var(--red);   color:#fff; }
-.filter-opt.selected-in  .filter-opt-check { border-color:var(--green); background:var(--green); color:#fff; }
-
-/* ── GROUP PILL SELECTOR ── */
-.group-pill-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-.group-pill-sel {
-  padding:7px 14px; border-radius:50px;
-  border:1.5px solid var(--border2); background:var(--surface2);
-  color:var(--muted); font-size:13px; font-weight:600;
-  font-family:'Sora',sans-serif; cursor:pointer;
-  transition:all 0.15s; white-space:nowrap;
-}
-.group-pill-sel:active { transform:scale(0.93); }
-.group-pill-sel.active { background:rgba(0,200,212,0.15); border-color:var(--accent); color:var(--accent); }
-.group-pill-sel.add-group-btn { border-style:dashed; }
-.group-pill-sel.add-group-btn:hover { border-color:var(--accent); color:var(--accent); }
-.add-group-inline { display:none; align-items:center; gap:8px; width:100%; margin-top:4px; }
-.add-group-inline.show { display:flex; }
-.add-group-inline input {
-  flex:1; background:var(--surface2);
-  border:1.5px solid var(--accent); border-radius:10px;
-  color:var(--text); font-family:'Sora',sans-serif;
-  font-size:13px; padding:8px 12px; outline:none; -webkit-appearance:none;
-}
-.add-group-inline button {
-  padding:8px 14px; border-radius:50px;
-  background:var(--accent); border:none;
-  color:#0d1117; font-size:12px; font-weight:700;
-  font-family:'Sora',sans-serif; cursor:pointer; white-space:nowrap;
-}
-
-/* ── COLOUR SWATCHES ── */
-.color-swatches { display:flex; gap:10px; }
-.color-swatch {
-  flex:1; padding:10px 6px; border-radius:12px;
-  cursor:pointer; border:2px solid transparent;
-  transition:all 0.15s;
-  display:flex; flex-direction:column; align-items:center; gap:5px;
-}
-.color-swatch:active { transform:scale(0.94); }
-.color-swatch[data-color="red"]    { background:rgba(255,77,109,0.12); }
-.color-swatch[data-color="yellow"] { background:rgba(247,201,72,0.12); }
-.color-swatch[data-color="green"]  { background:rgba(61,214,140,0.12); }
-.color-swatch[data-color="red"].selected    { border-color:var(--red); }
-.color-swatch[data-color="yellow"].selected { border-color:var(--yellow); }
-.color-swatch[data-color="green"].selected  { border-color:var(--green); }
-.swatch-dot { width:20px; height:20px; border-radius:50%; }
-.swatch-label { font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; letter-spacing:0.3px; }
-
-/* ── IMPORT TOGGLE ── */
-.import-mode-toggle {
-  display:flex; background:var(--surface2);
-  border-radius:50px; padding:3px; gap:3px;
-  border:1.5px solid var(--border2);
-}
-.import-mode-btn {
-  flex:1; padding:8px 12px; border-radius:50px;
-  border:none; background:transparent;
-  color:var(--muted); font-size:13px; font-weight:600;
-  font-family:'Sora',sans-serif; cursor:pointer; transition:all 0.15s;
-}
-.import-mode-btn.active { background:var(--surface3); color:var(--text); }
-
-/* ── BUTTONS ── */
-.btn-primary {
-  width:100%; padding:14px;
-  background:var(--accent); border:none; border-radius:50px;
-  color:#0d1117; font-family:'Sora',sans-serif;
-  font-size:15px; font-weight:800;
-  cursor:pointer; transition:background 0.15s, transform 0.1s;
-  box-shadow:0 4px 20px rgba(0,200,212,0.35); letter-spacing:0.3px;
-}
-.btn-primary:hover  { background:var(--accent2); }
-.btn-primary:active { transform:scale(0.97); }
-.btn-danger {
-  width:100%; padding:14px;
-  background:rgba(255,77,109,0.12); border:1.5px solid var(--red); border-radius:50px;
-  color:var(--red); font-family:'Sora',sans-serif;
-  font-size:15px; font-weight:800; cursor:pointer; transition:all 0.15s;
-}
-.btn-danger:hover  { background:rgba(255,77,109,0.22); }
-.btn-danger:active { transform:scale(0.97); }
-
-/* ── INFO ── */
-.info-section { margin-bottom:14px; }
-.info-section h3 { font-size:10px; font-weight:700; color:var(--accent); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; font-family:'JetBrains Mono',monospace; }
-.info-section p, .info-section li { font-size:13px; color:var(--muted); line-height:1.65; }
-.info-section ul { padding-left:16px; }
-.info-section li { margin-bottom:4px; }
-.color-legend { display:flex; gap:10px; margin-top:8px; }
-.color-legend-item { flex:1; padding:10px; border-radius:10px; display:flex; flex-direction:column; align-items:center; gap:5px; }
-.cl-dot { width:12px; height:12px; border-radius:50%; }
-.cl-label { font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; }
-
-/* ── TOAST ── */
-#toast {
-  position:fixed; bottom:calc(var(--footer-h) + 14px);
-  left:50%; transform:translateX(-50%) translateY(12px);
-  background:var(--surface3); border:1.5px solid var(--border2);
-  color:var(--text); font-size:13px; font-weight:600;
-  padding:10px 18px; border-radius:50px;
-  z-index:500; opacity:0; transition:opacity 0.2s, transform 0.2s;
-  pointer-events:none; white-space:nowrap;
-}
-#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
-/* ── DESKTOP ── */
-@media (min-width:600px) {
-  .modal { border-radius:24px; margin-bottom:40px; max-height:86dvh; }
-  .modal-backdrop { align-items:center; }
-  header, footer { padding-left:24px; padding-right:24px; }
-  main { padding:16px 20px 6px; }
-}
+  footer {
+    padding: 10px 4px 2px;
+    text-align: center;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: #2a2a2a;
+    letter-spacing: 0.08em;
+  }
 </style>
 </head>
 <body>
-<div id="app">
 
-  <header>
-    <button id="logo-btn" onclick="openModal('info-modal')" aria-label="About">
-      <div class="logo-icon">📌</div>
-      <span class="logo-text">Reminders</span>
-    </button>
-    <div class="header-right">
+<header>
+  <span></span>
+  <h1>Launcher</h1>
+</header>
 
-      <button class="pill-btn" onclick="openModal('filter-modal')">
-        <svg width="13" height="13" viewBox="0 0 15 15" fill="none">
-          <path d="M1 3h13M3 7.5h9M5.5 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        Filter
-      </button>
-      <button class="pill-btn primary" onclick="openAddModal(null)">+ Add</button>
-    </div>
-  </header>
+<!-- ============================================================
+     BUTTONS — edit these to customise your launcher
+     
+     To show a button:     add class "enabled"
+     To make it full-width: add class "wide"
+     Set href=""           to the URL you want
+     Edit the text inside  <span class="btn-label"> for the label
+     
+     Examples:
+       <a class="btn enabled" href="https://example.com">
+       <a class="btn enabled wide" href="https://example.com">
+============================================================ -->
 
-  <div id="filter-bar-active">
-    <span id="filter-bar-label">● Filtered</span>
-    <button id="filter-bar-clear" onclick="clearFilter()">Clear ✕</button>
-  </div>
+<div class="grid">
 
-  <main id="main-list">
-    <div id="empty">
-      <div class="em-icon">🗒️</div>
-      <p>No reminders yet.<br>Tap <strong>+ Add</strong> to get started.</p>
-    </div>
-  </main>
+  <!-- Button 1 -->
+  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/Reminders/">
+    <span class="btn-label">Reminders App</span>
+  </a>
 
-  <footer>
-    <span class="footer-stat" id="footer-stat">0 reminders</span>
-    <div class="footer-actions">
-      <button class="footer-btn" onclick="exportData()">⬇ Export</button>
-      <button class="footer-btn" onclick="openImportModal()">⬆ Import</button>
-    </div>
-  </footer>
+  <!-- Button 2 -->
+  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/Reminders/morning-strategise.html">
+    <span class="btn-label">Morning Strategise</span>
+  </a>
+
+  <!-- Button 3 -->
+  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/FoodTracker/#home">
+    <span class="btn-label">Food Tracker</span>
+  </a>
+
+  <!-- Button 4 -->
+  <a class="btn enabled" href="https://budgetneedsvswants.com/index.html">
+    <span class="btn-label">Needs VS Wants</span>
+  </a>
+
+  <!-- Button 5 -->
+  <a class="btn enabled" href="https://lyricflow-scroller.com/index.html">
+    <span class="btn-label">Lyric Flow</span>
+  </a>
+
+  <!-- Button 6 -->
+  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/Grants-Website/Home.html">
+    <span class="btn-label">Grant Music</span>
+  </a>
+
+  <!-- Button 7 -->
+  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/simply-health/index.html">
+    <span class="btn-label">Simply Health</span>
+  </a>
+
+  <!-- Button 8 -->
+  <a class="btn enabled" href="https://grantelliotwalker-coder.github.io/Greenroom-Electrical/Home.html">
+    <span class="btn-label">Greenroom Electrical</span>
+  </a>
+
+  <!-- Button 9 -->
+  <a class="btn" href="">
+    <span class="btn-label">Button 9</span>
+  </a>
+
+  <!-- Button 10 -->
+  <a class="btn" href="">
+    <span class="btn-label">Button 10</span>
+  </a>
+
+  <!-- Button 11 -->
+  <a class="btn" href="">
+    <span class="btn-label">Button 11</span>
+  </a>
+
+  <!-- Button 12 -->
+  <a class="btn" href="">
+    <span class="btn-label">Button 12</span>
+  </a>
+
+  <!-- Button 13 -->
+  <a class="btn" href="">
+    <span class="btn-label">Button 13</span>
+  </a>
+
+  <!-- Button 14 -->
+  <a class="btn" href="">
+    <span class="btn-label">Button 14</span>
+  </a>
+
+  <!-- Button 15 -->
+  <a class="btn" href="">
+    <span class="btn-label">Button 15</span>
+  </a>
+
+  <!-- Button 16 -->
+  <a class="btn" href="">
+    <span class="btn-label">Button 16</span>
+  </a>
+
 </div>
 
-<!-- ══ ADD MODAL ══ -->
-<div class="modal-backdrop" id="add-modal" onclick="backdropClose(event,'add-modal')">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">New Reminder</span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="modal-close" style="font-size:13px" onclick="openModal('settings-modal')" aria-label="Settings">⚙️</button>
-        <button class="modal-close" style="font-size:13px" onclick="openModal('info-modal')" aria-label="Help">ℹ️</button>
-        <button class="modal-close" onclick="closeModal('add-modal')" aria-label="Close">✕</button>
-      </div>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Who is this for? *</label>
-        <div class="group-pill-row" id="name-pill-row"></div>
-        <div class="add-group-inline" id="add-name-inline">
-          <input type="text" id="new-name-input" placeholder="Your name…" autocorrect="off" autocapitalize="words" spellcheck="false"
-            onkeydown="if(event.key==='Enter')confirmNewName()">
-          <button onclick="confirmNewName()">Add</button>
-        </div>
-        <div class="form-error" id="name-error">Please select or add a name</div>
-      </div>
-      <div class="form-group">
-        <label>Reminder *</label>
-        <input class="form-input" id="input-title" type="text" placeholder="What do you need to remember?" autocorrect="off">
-        <div class="form-error" id="title-error">Reminder text is required</div>
-      </div>
-      <div class="form-group">
-        <label>Note <span style="font-weight:400;opacity:0.5;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <textarea class="form-input" id="input-note" placeholder="Extra details…" rows="2"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Group</label>
-        <div class="group-pill-row" id="group-pill-row"></div>
-        <div class="add-group-inline" id="add-group-inline">
-          <input type="text" id="new-group-input" placeholder="Group name…" autocorrect="off"
-            onkeydown="if(event.key==='Enter')confirmNewGroup()">
-          <button onclick="confirmNewGroup()">Add</button>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Priority</label>
-        <div class="color-swatches" id="color-swatches"></div>
-      </div>
-      <!-- Sync toggle -->
-      <div id="sync-row" class="sync-row">
-        <label class="sync-label" for="sync-enabled">
-          <span class="sync-label-text">Enable GitHub Sync</span>
-          <span class="sync-label-sub" id="sync-sub">Configure in ⚙️ Settings first</span>
-        </label>
-        <div class="toggle-wrap">
-          <input type="checkbox" id="sync-enabled" class="toggle-input">
-          <div class="toggle-track" onclick="toggleSync()"><div class="toggle-thumb"></div></div>
-        </div>
-      </div>
+<footer>launcher · edit html to configure</footer>
 
-      <button class="btn-primary" onclick="addReminder()">+ Add Reminder</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ EDIT MODAL ══ -->
-<div class="modal-backdrop" id="edit-modal" onclick="backdropClose(event,'edit-modal')">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">Edit Reminder</span>
-      <button class="modal-close" onclick="closeModal('edit-modal')" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Reminder *</label>
-        <input class="form-input" id="edit-title" type="text" placeholder="What do you need to remember?" autocorrect="off">
-        <div class="form-error" id="edit-title-error">Reminder text is required</div>
-      </div>
-      <div class="form-group">
-        <label>Note <span style="font-weight:400;opacity:0.5;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <textarea class="form-input" id="edit-note" placeholder="Extra details…" rows="2"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Group</label>
-        <div class="group-pill-row" id="edit-group-pill-row"></div>
-        <div class="add-group-inline" id="edit-add-group-inline">
-          <input type="text" id="edit-new-group-input" placeholder="Group name…" autocorrect="off"
-            onkeydown="if(event.key==='Enter')confirmEditNewGroup()">
-          <button onclick="confirmEditNewGroup()">Add</button>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Priority</label>
-        <div class="color-swatches" id="edit-color-swatches"></div>
-      </div>
-      <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
-      <button class="btn-danger" onclick="deleteFromEdit()">Delete Reminder</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ FILTER MODAL ══ -->
-<div class="modal-backdrop" id="filter-modal" onclick="backdropClose(event,'filter-modal')">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">Filter</span>
-      <button class="modal-close" onclick="closeModal('filter-modal')" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-body" id="filter-modal-body"></div>
-  </div>
-</div>
-
-<!-- ══ SETTINGS MODAL ══ -->
-<div class="modal-backdrop" id="settings-modal" onclick="backdropClose(event,'settings-modal')">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">GitHub Sync</span>
-      <button class="modal-close" onclick="closeModal('settings-modal')" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Personal Access Token</label>
-        <input class="form-input" id="gh-token" type="password" placeholder="ghp_…" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
-      </div>
-      <div class="form-group">
-        <label>Repository</label>
-        <input class="form-input" id="gh-repo" type="text" placeholder="owner/repo" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
-      </div>
-      <div class="form-group">
-        <label>File path</label>
-        <input class="form-input" id="gh-path" type="text" placeholder="reminders.json" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
-      </div>
-      <div class="form-group">
-        <label>Branch</label>
-        <input class="form-input" id="gh-branch" type="text" placeholder="main" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:center">
-        <button class="btn-primary" style="flex:1;padding:12px;font-size:13px" onclick="saveGHSettings()">Save</button>
-        <button class="btn-primary" style="flex:1;padding:12px;font-size:13px;background:var(--surface3);border:1.5px solid var(--border2);color:var(--muted);box-shadow:none" onclick="testGHSettings()">Test</button>
-      </div>
-
-      <div id="gh-test-result" style="display:none;padding:10px 14px;border-radius:10px;font-size:12px;font-family:'JetBrains Mono',monospace;line-height:1.5"></div>
-
-      <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:4px">
-        Token needs <strong>Contents: Read &amp; Write</strong> on your repo.<br>
-        Go to GitHub → Settings → Developer settings → Fine-grained tokens.
-      </p>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal-backdrop" id="import-modal" onclick="backdropClose(event,'import-modal')">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">Import</span>
-      <button class="modal-close" onclick="closeModal('import-modal')" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Import mode</label>
-        <div class="import-mode-toggle">
-          <button class="import-mode-btn active" id="import-merge-btn" onclick="setImportMode('merge')">Merge</button>
-          <button class="import-mode-btn" id="import-overwrite-btn" onclick="setImportMode('overwrite')">Overwrite</button>
-        </div>
-        <p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5" id="import-mode-desc">
-          Adds new reminders from the file. Existing ones are kept — no duplicates.
-        </p>
-      </div>
-      <button class="btn-primary" onclick="triggerImport()">Choose File</button>
-      <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
-    </div>
-  </div>
-</div>
-
-<!-- ══ INFO MODAL ══ -->
-<div class="modal-backdrop" id="info-modal" onclick="backdropClose(event,'info-modal')">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">About</span>
-      <button class="modal-close" onclick="closeModal('info-modal')" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="info-section">
-        <h3>What is this?</h3>
-        <p>A local reminder app — everything saved in your browser, no accounts needed.</p>
-      </div>
-      <div class="info-section">
-        <h3>Priority colours</h3>
-        <div class="color-legend">
-          <div class="color-legend-item" style="background:rgba(255,77,109,0.12);border:1.5px solid var(--red)">
-            <div class="cl-dot" style="background:var(--red)"></div>
-            <span class="cl-label" style="color:var(--red)">URGENT</span>
-          </div>
-          <div class="color-legend-item" style="background:rgba(247,201,72,0.12);border:1.5px solid var(--yellow)">
-            <div class="cl-dot" style="background:var(--yellow)"></div>
-            <span class="cl-label" style="color:var(--yellow)">MEDIUM</span>
-          </div>
-          <div class="color-legend-item" style="background:rgba(61,214,140,0.12);border:1.5px solid var(--green)">
-            <div class="cl-dot" style="background:var(--green)"></div>
-            <span class="cl-label" style="color:var(--green)">LOW</span>
-          </div>
-        </div>
-        <p style="margin-top:10px">Red sorts to top, green to bottom. Done items sink — tap ✕ to clear, or tap circle again to restore.</p>
-      </div>
-      <div class="info-section">
-        <h3>Filtering</h3>
-        <ul>
-          <li><strong>Filter Out</strong> — all boxes start unticked. Tick the people or groups you want to <em>hide</em>.</li>
-          <li><strong>Filter In</strong> — all boxes start ticked. Untick the people or groups you want to <em>remove</em> from view.</li>
-          <li>People and groups work as an AND condition — both must match to be affected.</li>
-          <li>Tap <strong>Filtered ✕</strong> in the header to clear instantly.</li>
-        </ul>
-      </div>
-      <div class="info-section">
-        <h3>Groups</h3>
-        <p>General is always the default. Add custom groups in the add modal — they persist across sessions. Tap the <strong>+</strong> on any group card to quickly add to that group.</p>
-      </div>
-      <div class="info-section">
-        <h3>Export / Import</h3>
-        <p>Export saves a <code>.json</code> backup. Import can merge (add new) or overwrite (replace all).</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
-
-<script>
-// ── COLOURS ───────────────────────────────────────────────────
-const COLORS = [
-  {id:'red',    hex:'#ff4d6d', label:'Urgent', order:0},
-  {id:'yellow', hex:'#f7c948', label:'Medium', order:1},
-  {id:'green',  hex:'#3dd68c', label:'Low',    order:2},
-];
-function getColor(id) { return COLORS.find(c=>c.id===id)||COLORS[2]; }
-
-// ── STATE ─────────────────────────────────────────────────────
-let reminders    = safeJSON('reminders', []);
-let groups       = safeJSON('reminder_groups', ['General']);
-if (!groups.includes('General')) groups.unshift('General');
-let names        = safeJSON('reminder_names', []);
-// Seed names from existing reminders
-reminders.forEach(r=>{ if(r.author && !names.includes(r.author)) names.push(r.author); });
-
-let activeFilter  = safeJSON('reminder_filter', {mode:'out', people:[], groups:[]});
-let selectedColor = 'green';
-let selectedGroup = 'General';
-let selectedName  = names.length===1 ? names[0] : (localStorage.getItem('reminder_name')||'');
-let importMode    = 'merge';
-
-// tmp filter state while modal open
-let tmpFilter = {mode:'out', people:[], groups:[]};
-
-function safeJSON(k,fb){ try{const v=JSON.parse(localStorage.getItem(k)); return v!==null?v:fb;}catch(e){return fb;} }
-function save()       { localStorage.setItem('reminders', JSON.stringify(reminders)); }
-function saveGroups() { localStorage.setItem('reminder_groups', JSON.stringify(groups)); }
-function saveNames()  { localStorage.setItem('reminder_names', JSON.stringify(names)); }
-function saveFilter() { localStorage.setItem('reminder_filter', JSON.stringify(activeFilter)); }
-
-// ── FILTER ────────────────────────────────────────────────────
-function isFiltered() {
-  return activeFilter.people.length > 0 || activeFilter.groups.length > 0;
-}
-
-function passesFilter(r) {
-  if (!isFiltered()) return true;
-  const {mode, people, groups:fg} = activeFilter;
-  const personMatch = people.length===0 || people.includes(r.author||'');
-  const groupMatch  = fg.length===0     || fg.includes(r.group||'General');
-  let selected;
-  if (people.length>0 && fg.length>0) selected = personMatch && groupMatch;
-  else if (people.length>0) selected = personMatch;
-  else selected = groupMatch;
-  return mode==='out' ? !selected : selected;
-}
-
-function clearFilter() {
-  activeFilter.people = [];
-  activeFilter.groups = [];
-  saveFilter(); render();
-}
-
-// ── SORT ──────────────────────────────────────────────────────
-function sorted(list) {
-  const undone = list.filter(r=>!r.done).sort((a,b)=>{
-    const ca=getColor(a.color).order, cb=getColor(b.color).order;
-    if(ca!==cb) return ca-cb;
-    return a.created-b.created;
-  });
-  return [...undone, ...list.filter(r=>r.done)];
-}
-
-// ── RENDER ────────────────────────────────────────────────────
-function render() {
-  const list  = document.getElementById('main-list');
-  const empty = document.getElementById('empty');
-  Array.from(list.querySelectorAll('.group-card')).forEach(c=>c.remove());
-
-  const vis = sorted(reminders.filter(passesFilter));
-  empty.style.display = vis.length===0 ? 'flex' : 'none';
-
-  if (vis.length > 0) {
-    const grouped = {};
-    vis.forEach(r => {
-      const g = r.group||'General';
-      if (!grouped[g]) grouped[g] = [];
-      grouped[g].push(r);
-    });
-
-    const keys = Object.keys(grouped).sort((a,b)=>{
-      if(a==='General') return -1;
-      if(b==='General') return 1;
-      return a.localeCompare(b);
-    });
-
-    keys.forEach(g => {
-      const card = document.createElement('div');
-      card.className = 'group-card'+(g==='General'?' general-card':'');
-
-      if (g !== 'General') {
-        const hdr = document.createElement('div');
-        hdr.className = 'group-card-header';
-        hdr.innerHTML = `
-          <span class="group-card-title">${esc(g)}</span>
-          <span class="group-card-badge">${grouped[g].length}</span>
-          <button class="group-add-btn" title="Add to ${esc(g)}">+</button>
-        `;
-        hdr.querySelector('.group-add-btn').onclick = () => openAddModal(g);
-        card.appendChild(hdr);
-      }
-
-      const wrap = document.createElement('div');
-      wrap.className = 'group-pills';
-      grouped[g].forEach(r => wrap.appendChild(makePill(r)));
-      card.appendChild(wrap);
-      list.appendChild(card);
-    });
-  }
-
-  const done = reminders.filter(r=>r.done).length;
-  document.getElementById('footer-stat').textContent =
-    `${reminders.length} reminder${reminders.length!==1?'s':''} · ${done} done`;
-
-  document.getElementById('filter-bar-active').classList.toggle('visible', isFiltered());
-}
-
-function makePill(r) {
-  const col = getColor(r.color);
-  const el  = document.createElement('div');
-  el.className = 'reminder-pill'+(r.done?' done':'');
-  el.style.setProperty('--pill-color', col.hex);
-  el.dataset.id = r.id;
-  el.onclick = (e) => handlePillTap(r.id, e);
-  el.innerHTML = `
-    <div class="pill-dot" style="background:${col.hex};box-shadow:0 0 7px ${col.hex}80"></div>
-    <div class="pill-check" onclick="toggleDone('${r.id}',event)">${r.done?'✓':''}</div>
-    <div class="pill-body">
-      <div class="pill-title">${esc(r.title)}</div>
-      ${r.note   ?`<div class="pill-note">${esc(r.note)}</div>`:''}
-      ${r.author ?`<div class="pill-author">@${esc(r.author)}</div>`:''}
-    </div>
-    <button class="pill-delete" onclick="deleteReminder('${r.id}',event)" aria-label="Delete">✕</button>
-  `;
-  return el;
-}
-
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-// ── ADD MODAL ─────────────────────────────────────────────────
-function openAddModal(presetGroup) {
-  selectedGroup = 'General'; // always default to General
-  if (presetGroup && groups.includes(presetGroup)) selectedGroup = presetGroup;
-  openModal('add-modal');
-}
-
-function populateAddModal() {
-  document.getElementById('input-title').value = '';
-  document.getElementById('input-note').value  = '';
-  document.getElementById('input-title').classList.remove('error');
-  document.getElementById('title-error').classList.remove('show');
-  document.getElementById('name-error').classList.remove('show');
-  document.getElementById('add-group-inline').classList.remove('show');
-  document.getElementById('new-group-input').value = '';
-  document.getElementById('add-name-inline').classList.remove('show');
-  document.getElementById('new-name-input').value = '';
-
-  renderNamePills();
-  renderGroupPills();
-  renderColorSwatches();
-
-  // Reset sync toggle state for this open
-  const cb = document.getElementById('sync-enabled');
-  delete cb.dataset.manuallySet;
-  cb.checked = ghConfigured();
-  document.querySelector('.toggle-track').classList.toggle('on', cb.checked);
-  updateSyncRow();
-
-  setTimeout(()=>document.getElementById('input-title').focus(), 320);
-}
-
-function renderNamePills() {
-  const row = document.getElementById('name-pill-row');
-  row.innerHTML = '';
-  names.forEach(n => {
-    const p = document.createElement('button');
-    p.className = 'group-pill-sel'+(n===selectedName?' active':'');
-    p.textContent = n;
-    p.onclick = () => {
-      selectedName = n;
-      localStorage.setItem('reminder_name', n);
-      document.querySelectorAll('#name-pill-row .group-pill-sel:not(.add-group-btn)').forEach(b=>b.classList.remove('active'));
-      p.classList.add('active');
-      document.getElementById('name-error').classList.remove('show');
-    };
-    row.appendChild(p);
-  });
-  const addBtn = document.createElement('button');
-  addBtn.className = 'group-pill-sel add-group-btn';
-  addBtn.textContent = '+ Add Name';
-  addBtn.onclick = () => {
-    const inline = document.getElementById('add-name-inline');
-    inline.classList.toggle('show');
-    if (inline.classList.contains('show')) document.getElementById('new-name-input').focus();
-  };
-  row.appendChild(addBtn);
-}
-
-function confirmNewName() {
-  const input = document.getElementById('new-name-input');
-  const name  = input.value.trim();
-  if (!name || names.includes(name)) { input.value=''; return; }
-  names.push(name);
-  saveNames();
-  selectedName = name;
-  localStorage.setItem('reminder_name', name);
-  input.value = '';
-  document.getElementById('add-name-inline').classList.remove('show');
-  renderNamePills();
-}
-
-function renderGroupPills() {
-  const row = document.getElementById('group-pill-row');
-  row.innerHTML = '';
-  groups.forEach(g => {
-    const p = document.createElement('button');
-    p.className = 'group-pill-sel'+(g===selectedGroup?' active':'');
-    p.textContent = g;
-    p.onclick = () => {
-      selectedGroup = g;
-      document.querySelectorAll('.group-pill-sel:not(.add-group-btn)').forEach(b=>b.classList.remove('active'));
-      p.classList.add('active');
-    };
-    row.appendChild(p);
-  });
-  const addBtn = document.createElement('button');
-  addBtn.className = 'group-pill-sel add-group-btn';
-  addBtn.textContent = '+ Add Group';
-  addBtn.onclick = () => {
-    const inline = document.getElementById('add-group-inline');
-    inline.classList.toggle('show');
-    if (inline.classList.contains('show')) document.getElementById('new-group-input').focus();
-  };
-  row.appendChild(addBtn);
-}
-
-function renderColorSwatches() {
-  const sw = document.getElementById('color-swatches');
-  sw.innerHTML = '';
-  COLORS.forEach(c => {
-    const d = document.createElement('div');
-    d.className = 'color-swatch'+(c.id===selectedColor?' selected':'');
-    d.dataset.color = c.id; d.title = c.label;
-    d.innerHTML = `<div class="swatch-dot" style="background:${c.hex};box-shadow:0 0 10px ${c.hex}80"></div><span class="swatch-label" style="color:${c.hex}">${c.label.toUpperCase()}</span>`;
-    d.onclick = () => {
-      selectedColor = c.id;
-      document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
-      d.classList.add('selected');
-    };
-    sw.appendChild(d);
-  });
-}
-
-function confirmNewGroup() {
-  const input = document.getElementById('new-group-input');
-  const name  = input.value.trim();
-  if (!name || groups.includes(name)) { input.value=''; return; }
-  groups.push(name);
-  saveGroups();
-  selectedGroup = name;
-  input.value = '';
-  document.getElementById('add-group-inline').classList.remove('show');
-  renderGroupPills();
-}
-
-function addReminder() {
-  const title = document.getElementById('input-title').value.trim();
-  let valid = true;
-
-  if (!selectedName) {
-    document.getElementById('name-error').classList.add('show');
-    valid = false;
-  } else {
-    document.getElementById('name-error').classList.remove('show');
-  }
-  document.getElementById('input-title').classList.toggle('error', !title);
-  document.getElementById('title-error').classList.toggle('show', !title);
-  if (!valid || !title) return;
-
-  const r = {
-    id:      Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-    title,
-    note:    document.getElementById('input-note').value.trim(),
-    group:   selectedGroup,
-    color:   selectedColor,
-    author:  selectedName,
-    done:    false,
-    created: Date.now()
-  };
-  reminders.unshift(r);
-  save(); closeModal('add-modal'); render(); toast('Reminder added ✓');
-
-  if (syncEnabled()) {
-    ghPushAll()
-      .then(()=>toast('Synced to GitHub ✓'))
-      .catch(e=>{ console.warn('GitHub push failed',e); toast('Add OK — sync failed ✕'); });
-  }
-}
-
-// ── FILTER MODAL ──────────────────────────────────────────────
-function populateFilterModal() {
-  tmpFilter = {mode:activeFilter.mode, people:[...activeFilter.people], groups:[...activeFilter.groups]};
-  const body = document.getElementById('filter-modal-body');
-  body.innerHTML = '';
-
-  // Mode toggle
-  const modeWrap = document.createElement('div');
-  modeWrap.className = 'form-group';
-  modeWrap.innerHTML = `
-    <label>Mode</label>
-    <div class="mode-toggle">
-      <button class="mode-btn out ${tmpFilter.mode==='out'?'active':''}" id="fmode-out" onclick="setTmpMode('out')">
-        <span class="mode-title">Filter Out</span>
-        <span class="mode-sub">hide selected</span>
-      </button>
-      <button class="mode-btn in ${tmpFilter.mode==='in'?'active':''}" id="fmode-in" onclick="setTmpMode('in')">
-        <span class="mode-title">Filter In</span>
-        <span class="mode-sub">show selected</span>
-      </button>
-    </div>
-  `;
-  body.appendChild(modeWrap);
-
-  // People
-  const people = [...new Set(reminders.map(r=>r.author).filter(Boolean))];
-  if (people.length > 0) {
-    const lbl = document.createElement('div');
-    lbl.className='filter-section-label'; lbl.textContent='People';
-    body.appendChild(lbl);
-    people.forEach(p => body.appendChild(makeFilterOpt('person', p, p, reminders.filter(r=>r.author===p).length, personColor(p))));
-  }
-
-  // Groups
-  const glbl = document.createElement('div');
-  glbl.className='filter-section-label';
-  if (people.length>0) glbl.style.marginTop='8px';
-  glbl.textContent='Groups';
-  body.appendChild(glbl);
-  groups.forEach(g => body.appendChild(makeFilterOpt('group', g, g, reminders.filter(r=>(r.group||'General')===g).length, groupColor(g))));
-
-  // Actions
-  const actions = document.createElement('div');
-  actions.style.cssText='display:flex;gap:10px;margin-top:4px';
-  actions.innerHTML=`
-    <button class="btn-danger" style="flex:1;padding:12px;font-size:13px" onclick="clearFilter();closeModal('filter-modal')">Clear</button>
-    <button class="btn-primary" style="flex:2;padding:12px;font-size:13px" onclick="applyFilter()">Apply</button>
-  `;
-  body.appendChild(actions);
-}
-
-function makeFilterOpt(type, key, label, count, color) {
-  const list = type==='person' ? tmpFilter.people : tmpFilter.groups;
-  const sel  = list.includes(key);
-  const d    = document.createElement('div');
-  d.className = 'filter-opt'+(sel?(tmpFilter.mode==='out'?' selected-out':' selected-in'):'');
-  d.id = `fopt-${type}-${key}`;
-  d.innerHTML = `
-    <div class="filter-opt-dot" style="background:${color}"></div>
-    <span class="filter-opt-name">${esc(label)}</span>
-    <span class="filter-opt-cnt">${count}</span>
-    <div class="filter-opt-check">${sel?'✓':''}</div>
-  `;
-  d.onclick = () => {
-    const lst = type==='person' ? tmpFilter.people : tmpFilter.groups;
-    const idx = lst.indexOf(key);
-    if(idx>=0) lst.splice(idx,1); else lst.push(key);
-    const nowSel = lst.includes(key);
-    d.className = 'filter-opt'+(nowSel?(tmpFilter.mode==='out'?' selected-out':' selected-in'):'');
-    d.querySelector('.filter-opt-check').textContent = nowSel?'✓':'';
-  };
-  return d;
-}
-
-function setTmpMode(mode) {
-  tmpFilter.mode = mode;
-  document.getElementById('fmode-out').className=`mode-btn out ${mode==='out'?'active':''}`;
-  document.getElementById('fmode-in').className =`mode-btn in  ${mode==='in' ?'active':''}`;
-
-  // Filter In → tick all (deselect what you don't want shown)
-  // Filter Out → untick all (select what you want hidden)
-  const allPeople = [...new Set(reminders.map(r=>r.author).filter(Boolean))];
-  const allGroups = [...groups];
-  if (mode==='in') {
-    tmpFilter.people = [...allPeople];
-    tmpFilter.groups = [...allGroups];
-  } else {
-    tmpFilter.people = [];
-    tmpFilter.groups = [];
-  }
-
-  // Re-render opt states
-  document.querySelectorAll('.filter-opt').forEach(el=>{
-    const parts = el.id.replace('fopt-','').split('-');
-    const type  = parts[0];
-    const key   = parts.slice(1).join('-');
-    const list  = type==='person' ? tmpFilter.people : tmpFilter.groups;
-    const sel   = list.includes(key);
-    el.className = 'filter-opt'+(sel?(mode==='out'?' selected-out':' selected-in'):'');
-    el.querySelector('.filter-opt-check').textContent = sel?'✓':'';
-  });
-}
-
-function applyFilter() {
-  activeFilter = {...tmpFilter};
-  saveFilter(); render(); closeModal('filter-modal');
-}
-
-// ── IMPORT ────────────────────────────────────────────────────
-function openImportModal() {
-  importMode='merge';
-  document.getElementById('import-merge-btn').classList.add('active');
-  document.getElementById('import-overwrite-btn').classList.remove('active');
-  document.getElementById('import-mode-desc').textContent='Adds new reminders from the file. Existing ones are kept — no duplicates.';
-  openModal('import-modal');
-}
-function setImportMode(mode) {
-  importMode=mode;
-  document.getElementById('import-merge-btn').classList.toggle('active', mode==='merge');
-  document.getElementById('import-overwrite-btn').classList.toggle('active', mode==='overwrite');
-  document.getElementById('import-mode-desc').textContent = mode==='merge'
-    ? 'Adds new reminders from the file. Existing ones are kept — no duplicates.'
-    : '⚠️ Replaces ALL current reminders with the imported file. This cannot be undone.';
-}
-function triggerImport() { document.getElementById('import-input').click(); }
-function importData(e) {
-  const file=e.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const imp=JSON.parse(ev.target.result);
-      if(!Array.isArray(imp)) throw 0;
-      if(importMode==='overwrite'){
-        reminders=imp;
-      } else {
-        const ids=new Set(reminders.map(r=>r.id));
-        const fresh=imp.filter(r=>!ids.has(r.id));
-        reminders=[...fresh,...reminders];
-      }
-      // Merge any new groups
-      imp.forEach(r=>{ if(r.group && !groups.includes(r.group)) groups.push(r.group); });
-      save(); saveGroups(); render(); closeModal('import-modal');
-      toast(importMode==='overwrite'?`Overwrote with ${imp.length} reminder${imp.length!==1?'s':''} ✓`:`Merged ✓`);
-    }catch{ toast('Invalid file ✕'); }
-  };
-  reader.readAsText(file); e.target.value='';
-}
-
-// ── EXPORT ────────────────────────────────────────────────────
-function exportData() {
-  const b=new Blob([JSON.stringify(reminders,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(b);
-  a.download=`reminders-${new Date().toISOString().slice(0,10)}.json`;
-  a.click(); toast('Exported ✓');
-}
-
-// ── SELECTED PILL ─────────────────────────────────────────────
-let selectedPillId = null;
-
-function handlePillTap(id, e) {
-  // Don't intercept check or delete button taps
-  if (e.target.closest('.pill-check') || e.target.closest('.pill-delete')) return;
-
-  if (selectedPillId === id) {
-    // Second tap — open edit modal
-    openEditModal(id);
-  } else {
-    // First tap — select it
-    deselectAll();
-    selectedPillId = id;
-    const el = document.querySelector(`.reminder-pill[data-id="${id}"]`);
-    if (el) el.classList.add('selected');
-  }
-}
-
-function deselectAll() {
-  selectedPillId = null;
-  document.querySelectorAll('.reminder-pill.selected').forEach(p=>p.classList.remove('selected'));
-}
-
-// ── EDIT MODAL ────────────────────────────────────────────────
-let editingId     = null;
-let editGroup     = 'General';
-let editColor     = 'green';
-
-function openEditModal(id) {
-  const r = reminders.find(x=>x.id===id);
-  if (!r) return;
-  editingId = id;
-  editGroup = r.group || 'General';
-  editColor = r.color || 'green';
-
-  document.getElementById('edit-title').value = r.title;
-  document.getElementById('edit-note').value  = r.note||'';
-  document.getElementById('edit-title').classList.remove('error');
-  document.getElementById('edit-title-error').classList.remove('show');
-  document.getElementById('edit-add-group-inline').classList.remove('show');
-  document.getElementById('edit-new-group-input').value = '';
-
-  renderEditGroupPills();
-  renderEditColorSwatches();
-
-  deselectAll();
-  openModal('edit-modal');
-  setTimeout(()=>document.getElementById('edit-title').focus(), 320);
-}
-
-function renderEditGroupPills() {
-  const row = document.getElementById('edit-group-pill-row');
-  row.innerHTML = '';
-  groups.forEach(g => {
-    const p = document.createElement('button');
-    p.className = 'group-pill-sel'+(g===editGroup?' active':'');
-    p.textContent = g;
-    p.onclick = () => {
-      editGroup = g;
-      document.querySelectorAll('#edit-group-pill-row .group-pill-sel:not(.add-group-btn)').forEach(b=>b.classList.remove('active'));
-      p.classList.add('active');
-    };
-    row.appendChild(p);
-  });
-  const addBtn = document.createElement('button');
-  addBtn.className = 'group-pill-sel add-group-btn';
-  addBtn.textContent = '+ Add Group';
-  addBtn.onclick = () => {
-    const inline = document.getElementById('edit-add-group-inline');
-    inline.classList.toggle('show');
-    if (inline.classList.contains('show')) document.getElementById('edit-new-group-input').focus();
-  };
-  row.appendChild(addBtn);
-}
-
-function renderEditColorSwatches() {
-  const sw = document.getElementById('edit-color-swatches');
-  sw.innerHTML = '';
-  COLORS.forEach(c => {
-    const d = document.createElement('div');
-    d.className = 'color-swatch'+(c.id===editColor?' selected':'');
-    d.dataset.color = c.id; d.title = c.label;
-    d.innerHTML = `<div class="swatch-dot" style="background:${c.hex};box-shadow:0 0 10px ${c.hex}80"></div><span class="swatch-label" style="color:${c.hex}">${c.label.toUpperCase()}</span>`;
-    d.onclick = () => {
-      editColor = c.id;
-      document.querySelectorAll('#edit-color-swatches .color-swatch').forEach(s=>s.classList.remove('selected'));
-      d.classList.add('selected');
-    };
-    sw.appendChild(d);
-  });
-}
-
-function confirmEditNewGroup() {
-  const input = document.getElementById('edit-new-group-input');
-  const name  = input.value.trim();
-  if (!name || groups.includes(name)) { input.value=''; return; }
-  groups.push(name);
-  saveGroups();
-  editGroup = name;
-  input.value = '';
-  document.getElementById('edit-add-group-inline').classList.remove('show');
-  renderEditGroupPills();
-}
-
-function saveEdit() {
-  const title = document.getElementById('edit-title').value.trim();
-  if (!title) {
-    document.getElementById('edit-title').classList.add('error');
-    document.getElementById('edit-title-error').classList.add('show');
-    return;
-  }
-  const r = reminders.find(x=>x.id===editingId);
-  if (!r) return;
-  r.title = title;
-  r.note  = document.getElementById('edit-note').value.trim();
-  r.group = editGroup;
-  r.color = editColor;
-  save(); closeModal('edit-modal'); render(); toast('Reminder updated ✓');
-  if (ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
-}
-
-function deleteFromEdit() {
-  reminders = reminders.filter(x=>x.id!==editingId);
-  save(); closeModal('edit-modal'); render(); toast('Removed');
-  if (ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
-}
-
-// ── ACTIONS ───────────────────────────────────────────────────
-function toggleDone(id,e){
-  e.stopPropagation();
-  const r=reminders.find(x=>x.id===id);
-  if(r){
-    r.done=!r.done; save(); render();
-    if(ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
-  }
-}
-function deleteReminder(id,e){
-  e.stopPropagation();
-  reminders=reminders.filter(x=>x.id!==id);
-  save(); render(); toast('Removed');
-  if(ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
-}
-
-// ── MODALS ────────────────────────────────────────────────────
-function openModal(id){
-  ['add-modal','edit-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(m=>{ if(m!==id) document.getElementById(m).classList.remove('open'); });
-  document.getElementById(id).classList.add('open');
-  if(id==='add-modal')      populateAddModal();
-  if(id==='filter-modal')   populateFilterModal();
-  if(id==='settings-modal') populateSettingsModal();
-}
-function closeModal(id){ document.getElementById(id).classList.remove('open'); deselectAll(); }
-function backdropClose(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
-
-// Tap on main background deselects
-document.getElementById('main-list').addEventListener('click', e=>{
-  if (!e.target.closest('.reminder-pill')) deselectAll();
-});
-
-// ── HELPERS ───────────────────────────────────────────────────
-function personColor(n){
-  const c=['#00c8d4','#ff4d6d','#f7c948','#3dd68c','#a78bfa','#f472b6'];
-  return c[Math.abs(hashStr(n))%c.length];
-}
-function groupColor(g){
-  const c=['#00c8d4','#3dd68c','#ff8c42','#f472b6','#a78bfa','#f7c948'];
-  return c[Math.abs(hashStr(g))%c.length];
-}
-function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return h;}
-
-// ── TOAST ─────────────────────────────────────────────────────
-let toastTimer;
-function toast(msg){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
-}
-
-// ── GITHUB SETTINGS ───────────────────────────────────────────
-function ghConfigured() {
-  return !!(localStorage.getItem('gh_token') && localStorage.getItem('gh_repo'));
-}
-function ghApiUrl() {
-  const repo = localStorage.getItem('gh_repo')||'';
-  const path = localStorage.getItem('gh_path')||'reminders.json';
-  return `https://api.github.com/repos/${repo}/contents/${path}`;
-}
-function ghHeaders() {
-  return { Authorization:`Bearer ${localStorage.getItem('gh_token')}`, Accept:'application/vnd.github.v3+json' };
-}
-
-function populateSettingsModal() {
-  document.getElementById('gh-token').value  = localStorage.getItem('gh_token')||'';
-  document.getElementById('gh-repo').value   = localStorage.getItem('gh_repo')||'';
-  document.getElementById('gh-path').value   = localStorage.getItem('gh_path')||'reminders.json';
-  document.getElementById('gh-branch').value = localStorage.getItem('gh_branch')||'main';
-  const res = document.getElementById('gh-test-result');
-  res.style.display='none'; res.className=''; res.textContent='';
-}
-
-function saveGHSettings() {
-  localStorage.setItem('gh_token',  document.getElementById('gh-token').value.trim());
-  localStorage.setItem('gh_repo',   document.getElementById('gh-repo').value.trim());
-  localStorage.setItem('gh_path',   document.getElementById('gh-path').value.trim()||'reminders.json');
-  localStorage.setItem('gh_branch', document.getElementById('gh-branch').value.trim()||'main');
-  updateSyncRow();
-  toast('Settings saved ✓');
-}
-
-async function testGHSettings() {
-  saveGHSettings();
-  const res = document.getElementById('gh-test-result');
-  res.style.display='block'; res.className=''; res.textContent='Testing…';
-  try {
-    const branch = localStorage.getItem('gh_branch')||'main';
-    const r = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
-    if (r.ok) {
-      res.className='ok';
-      res.textContent='✓ Connected — file found and readable';
-      localStorage.setItem('gh_tested','1');
-      updateSyncRow();
-    } else {
-      const d = await r.json();
-      res.className='err';
-      res.textContent=`✕ ${r.status}: ${d.message||'Check token, repo and file path'}`;
-      localStorage.removeItem('gh_tested');
-      updateSyncRow();
-    }
-  } catch(e) {
-    res.className='err';
-    res.textContent='✕ Network error — check your connection';
-    localStorage.removeItem('gh_tested');
-    updateSyncRow();
-  }
-}
-
-async function ghFetch() {
-  const branch = localStorage.getItem('gh_branch')||'main';
-  const r = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
-  if (!r.ok) return null;
-  const d = await r.json();
-  return JSON.parse(atob(d.content.replace(/\n/g,'')));
-}
-
-async function ghPushAll() {
-  const branch = localStorage.getItem('gh_branch')||'main';
-  // Get current SHA
-  let sha = null;
-  try {
-    const g = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
-    if (g.ok) { const d=await g.json(); sha=d.sha; }
-  } catch(e) {}
-  const body = {
-    message: `Update reminders`,
-    content: btoa(unescape(encodeURIComponent(JSON.stringify(reminders,null,2)))),
-    branch
-  };
-  if (sha) body.sha = sha;
-  const r = await fetch(ghApiUrl(), {
-    method:'PUT',
-    headers:{...ghHeaders(),'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if (!r.ok) throw new Error(await r.text());
-}
-
-// ── SYNC ROW ──────────────────────────────────────────────────
-function updateSyncRow() {
-  const configured = ghConfigured();
-  const row   = document.getElementById('sync-row');
-  const track = document.querySelector('.toggle-track');
-  const sub   = document.getElementById('sync-sub');
-  const cb    = document.getElementById('sync-enabled');
-
-  if (!configured) {
-    row.classList.add('disabled');
-    sub.textContent = 'Configure in ⚙️ Settings first';
-    cb.checked = false;
-    track.classList.remove('on');
-  } else {
-    row.classList.remove('disabled');
-    sub.textContent = 'Pulls on load · pushes on add';
-    // Default on if configured
-    if (cb.checked === false && !cb.dataset.manuallySet) {
-      cb.checked = true;
-      track.classList.add('on');
-    }
-  }
-}
-
-function toggleSync() {
-  if (!ghConfigured()) return;
-  const cb    = document.getElementById('sync-enabled');
-  const track = document.querySelector('.toggle-track');
-  cb.checked = !cb.checked;
-  cb.dataset.manuallySet = '1';
-  track.classList.toggle('on', cb.checked);
-}
-
-function syncEnabled() {
-  return ghConfigured() && document.getElementById('sync-enabled').checked;
-}
-
-// ── KEYBOARD ──────────────────────────────────────────────────
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') ['add-modal','edit-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(closeModal);
-  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openAddModal(null);}
-});
-
-// ── INIT ──────────────────────────────────────────────────────
-async function init() {
-  render();
-  if (!ghConfigured()) return;
-
-  try {
-    const data = await ghFetch();
-    if (!data) return;
-
-    // GitHub is the master copy — start from it
-    // Keep anything local that GitHub doesn't have yet (added offline)
-    const ghIds = new Set(data.map(r=>r.id));
-    const localOnly = reminders.filter(r=>!ghIds.has(r.id));
-
-    // Build full list: GitHub data + anything added locally but not yet pushed
-    reminders = [...localOnly, ...data];
-
-    // Merge groups and names
-    data.forEach(r=>{
-      if(r.group  && !groups.includes(r.group))  groups.push(r.group);
-      if(r.author && !names.includes(r.author))  names.push(r.author);
-    });
-
-    save(); saveGroups(); saveNames(); render();
-
-    // If we had local-only items, push them up now
-    if (localOnly.length > 0) {
-      await ghPushAll();
-      toast(`Synced ${localOnly.length} local reminder${localOnly.length!==1?'s':''} to GitHub ✓`);
-    }
-
-  } catch(e) {
-    console.warn('GitHub pull failed on load', e);
-    // Fall back to whatever is in localStorage silently
-  }
-}
-
-init();
-</script>
 </body>
 </html>
