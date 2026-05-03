@@ -2,890 +2,1597 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Morning Strategise</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Reminders</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=DM+Serif+Display:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-  }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 
-  :root {
-    --gold: #C9A84C;
-    --gold-light: #E8C97A;
-    --gold-dim: #8B6914;
-    --gold-pale: #F5E6B8;
-    --black: #0A0A0A;
-    --font: 'Cormorant Garamond', serif;
-    --font-size: 17px;
-  }
+:root {
+  --bg:      #0d1117;
+  --surface: #161b22;
+  --surface2:#1c2230;
+  --surface3:#232c3d;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text:    #e6edf3;
+  --muted:   #6e7f96;
+  --accent:  #00c8d4;
+  --accent2: #00e5f0;
+  --red:     #ff4d6d;
+  --yellow:  #f7c948;
+  --green:   #3dd68c;
+  --header-h:62px;
+  --footer-h:50px;
+}
 
-  html, body {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background: var(--black);
-    font-family: var(--font);
-    -webkit-font-smoothing: antialiased;
-    touch-action: none;
-  }
+html {
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
 
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 0;
-    position: relative;
-  }
+#app {
+  display: flex; flex-direction: column;
+  height: 100%; height: 100dvh;
+  width: 100%; max-width: 900px;
+  margin: 0 auto;
+  overflow: hidden;
+}
 
-  /* Subtle background grain */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
+/* ── HEADER ── */
+header {
+  flex: 0 0 auto;
+  display: flex; align-items: center;
+  padding: env(safe-area-inset-top,0) 16px 0;
+  min-height: var(--header-h);
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(13,17,23,0.97);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  z-index: 10;
+  flex-shrink: 0;
+}
 
-  /* ── HEADER ── */
-  .header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 28px 20px 20px;
-    flex-shrink: 0;
-    z-index: 10;
-  }
+#logo-btn {
+  display:flex; align-items:center; gap:10px;
+  background:none; border:none; cursor:pointer;
+  padding:6px 0; flex:1;
+}
+.logo-icon {
+  width:34px; height:34px;
+  background:var(--surface2);
+  border:1.5px solid var(--accent);
+  border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px; flex-shrink:0;
+  box-shadow:0 0 16px rgba(0,200,212,0.25);
+}
+.logo-text { font-size:16px; font-weight:800; color:var(--text); letter-spacing:0.3px; text-transform:uppercase; }
 
-  .logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    font-weight: 400;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    background: linear-gradient(135deg, var(--gold-dim) 0%, var(--gold-light) 40%, var(--gold) 60%, var(--gold-pale) 80%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 12px rgba(201,168,76,0.3));
-    line-height: 1;
-    user-select: none;
-  }
+.header-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
 
-  .logo span {
-    font-style: italic;
-    font-size: 0.85em;
-    letter-spacing: 0.22em;
-  }
 
-  /* ── MODE BUTTON ── */
-  .mode-btn {
-    position: absolute;
-    left: 18px;
-    top: 26px;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 1px solid rgba(201,168,76,0.3);
-    background: rgba(201,168,76,0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    backdrop-filter: blur(8px);
-  }
 
-  .mode-btn:active {
-    background: rgba(201,168,76,0.18);
-    border-color: rgba(201,168,76,0.6);
-    transform: scale(0.93);
-  }
+.pill-btn {
+  display:flex; align-items:center; gap:6px;
+  padding:8px 16px; border-radius:50px;
+  border:1.5px solid var(--border2);
+  background:var(--surface2);
+  color:var(--muted); font-size:13px; font-weight:600;
+  font-family:'Sora',sans-serif;
+  cursor:pointer; transition:all 0.15s; white-space:nowrap;
+}
+.pill-btn:active { transform:scale(0.93); }
+.pill-btn:hover  { border-color:var(--accent); color:var(--text); }
+.pill-btn.primary {
+  background:var(--accent); border-color:var(--accent);
+  color:#0d1117; font-weight:700;
+  box-shadow:0 0 16px rgba(0,200,212,0.35);
+}
+.pill-btn.primary:hover { background:var(--accent2); border-color:var(--accent2); }
 
-  .mode-btn svg {
-    width: 17px;
-    height: 17px;
-    stroke: var(--gold);
-    opacity: 0.8;
-  }
+/* ── MAIN ── */
+main {
+  flex: 1 1 0;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 14px 13px 60px;
+  min-height: 0;
+}
+main::-webkit-scrollbar { width: 3px; }
+main::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
 
-  /* ── MODE POPUP ── */
-  .mode-popup {
-    position: fixed;
-    top: 80px;
-    left: 18px;
-    z-index: 200;
-    background: linear-gradient(160deg, #181508, #110f07);
-    border: 1px solid rgba(201,168,76,0.28);
-    border-radius: 16px;
-    padding: 8px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.06);
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 170px;
-    transform-origin: top left;
-    transform: scale(0.9);
-    opacity: 0;
-    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), opacity 0.18s ease;
-  }
+/* ── GROUP CARD ── */
+.group-card {
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  margin-bottom:12px;
+  overflow:visible;
+  flex-shrink:0;
+}
+.group-card-header {
+  display:flex; align-items:center;
+  padding:11px 12px 10px;
+  border-bottom:1px solid var(--border);
+  gap:8px;
+}
+.group-card-title { font-size:15px; font-weight:700; color:var(--text); flex:1; }
+.group-card-badge {
+  font-size:10px; font-weight:700;
+  padding:3px 9px; border-radius:20px;
+  background:var(--surface3); color:var(--accent);
+  font-family:'JetBrains Mono',monospace;
+  text-transform:uppercase; letter-spacing:0.5px;
+}
+.group-add-btn {
+  width:28px; height:28px; border-radius:50%;
+  background:var(--surface3); border:1.5px solid var(--border2);
+  color:var(--accent); font-size:18px; font-weight:300;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.15s; flex-shrink:0;
+  line-height:1;
+}
+.group-add-btn:hover  { background:var(--accent); color:#0d1117; border-color:var(--accent); }
+.group-add-btn:active { transform:scale(0.88); }
 
-  .mode-popup.open {
-    display: flex;
-    transform: scale(1);
-    opacity: 1;
-  }
+.group-pills { padding:8px 10px 10px; display:flex; flex-direction:column; gap:7px; }
+.group-card.general-card { background:transparent; border-color:transparent; }
+.group-card.general-card .group-card-header { display:none; }
+.group-card.general-card .group-pills { padding:0 0 12px; }
 
-  .mode-option {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.15s ease;
-    touch-action: manipulation;
-  }
+/* ── REMINDER PILL ── */
+.reminder-pill {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:50px;
+  background:var(--surface2); border:1.5px solid var(--border2);
+  animation:slideIn 0.18s ease;
+  transition:opacity 0.25s, border-color 0.15s, box-shadow 0.15s;
+  cursor:pointer;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+@keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.reminder-pill.done { opacity:0.35; }
+.reminder-pill.done .pill-title { text-decoration:line-through; }
+.reminder-pill.selected {
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(0,200,212,0.18);
+}
 
-  .mode-option:active,
-  .mode-option.active {
-    background: rgba(201,168,76,0.12);
-  }
+.pill-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.pill-check {
+  width:24px; height:24px; border-radius:50%;
+  border:2px solid var(--pill-color, var(--accent));
+  flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition:background 0.15s; cursor:pointer;
+  font-size:11px; font-weight:700; color:transparent;
+}
+.pill-check:active { transform:scale(0.88); }
+.reminder-pill.done .pill-check { background:var(--pill-color); color:#fff; }
 
-  .mode-option.active .mode-icon {
-    opacity: 1;
-    color: var(--gold-light);
-  }
+.pill-body { flex:1; min-width:0; }
+.pill-title  { font-size:13px; font-weight:600; line-height:1.3; }
+.pill-note   { font-size:11px; color:var(--muted); line-height:1.4; margin-top:2px; }
+.pill-author { font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:2px; }
 
-  .mode-option.active .mode-label {
-    color: var(--gold-light);
-  }
+.pill-delete {
+  background:none; border:none; color:var(--red);
+  cursor:pointer; font-size:17px; line-height:1;
+  padding:3px 5px; border-radius:50%;
+  transition:opacity 0.2s, background 0.15s;
+  flex-shrink:0; opacity:0; pointer-events:none;
+}
+.reminder-pill.done .pill-delete { opacity:1; pointer-events:all; }
+.pill-delete:hover { background:rgba(255,77,109,0.15); }
 
-  .mode-icon {
-    font-size: 16px;
-    opacity: 0.55;
-    color: var(--gold);
-    flex-shrink: 0;
-    width: 20px;
-    text-align: center;
-    font-family: monospace;
-    font-style: normal;
-    line-height: 1;
-  }
+/* ── EMPTY ── */
+#empty {
+  display:none; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:12px; opacity:0.4; text-align:center;
+  padding: 80px 20px;
+}
+#empty .em-icon { font-size:44px; }
+#empty p { font-size:14px; color:var(--muted); line-height:1.6; }
 
-  .mode-label {
-    font-family: 'DM Serif Display', serif;
-    font-size: 13px;
-    letter-spacing: 0.12em;
-    color: rgba(245,230,184,0.65);
-    line-height: 1;
-  }
+/* ── FOOTER ── */
+footer {
+  flex: 0 0 var(--footer-h);
+  flex-shrink: 0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px; border-top:1px solid var(--border);
+  background:rgba(13,17,23,0.97);
+}
+.footer-stat { font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+.footer-actions { display:flex; gap:7px; }
+.footer-btn {
+  font-size:11px; font-weight:600; font-family:'Sora',sans-serif;
+  color:var(--muted); background:none;
+  border:1.5px solid var(--border2); border-radius:50px;
+  padding:5px 12px; cursor:pointer; transition:all 0.15s;
+}
+.footer-btn:hover  { color:var(--text); border-color:var(--accent); }
+.footer-btn:active { transform:scale(0.93); }
 
-  .mode-divider {
-    height: 1px;
-    background: rgba(201,168,76,0.12);
-    margin: 2px 0;
-  }
+/* ── MODAL ── */
+.modal-backdrop {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  z-index:100; display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.2s;
+}
+.modal-backdrop.open { opacity:1; pointer-events:all; }
+.modal {
+  background:var(--surface); border:1px solid var(--border2);
+  border-radius:24px 24px 0 0;
+  width:100%; max-width:580px;
+  padding:0 0 env(safe-area-inset-bottom,16px);
+  transform:translateY(30px);
+  transition:transform 0.26s cubic-bezier(0.34,1.5,0.64,1);
+  max-height:92dvh; display:flex; flex-direction:column;
+}
+.modal-backdrop.open .modal { transform:translateY(0); }
+.modal-handle { width:38px; height:4px; background:var(--border2); border-radius:2px; margin:12px auto 0; flex-shrink:0; }
+.modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:15px 18px 12px; flex-shrink:0;
+}
+.modal-title { font-size:17px; font-weight:800; letter-spacing:0.2px; text-transform:uppercase; }
+.modal-close {
+  width:30px; height:30px; border-radius:50%;
+  background:var(--surface3); border:none; color:var(--muted);
+  font-size:15px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.modal-close:hover { color:var(--text); }
+.modal-body {
+  flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:0 18px 18px; display:flex; flex-direction:column; gap:16px;
+}
+.modal-body::-webkit-scrollbar { width:3px; }
+.modal-body::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:3px; }
 
-  /* ── SETTINGS BUTTON ── */
-  .settings-btn {
-    position: absolute;
-    right: 18px;
-    top: 26px;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 1px solid rgba(201,168,76,0.3);
-    background: rgba(201,168,76,0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    backdrop-filter: blur(8px);
-  }
+/* ── FORM ── */
+.form-group label {
+  display:block; font-size:10px; font-weight:700;
+  text-transform:uppercase; letter-spacing:1px;
+  color:var(--muted); margin-bottom:8px;
+  font-family:'JetBrains Mono',monospace;
+}
+.form-input {
+  width:100%; background:var(--surface2);
+  border:1.5px solid var(--border2); border-radius:12px;
+  color:var(--text); font-family:'Sora',sans-serif;
+  font-size:14px; padding:11px 14px; outline:none;
+  transition:border-color 0.15s;
+  -webkit-appearance:none; appearance:none;
+}
+.form-input:focus { border-color:var(--accent); }
+.form-input.error { border-color:var(--red); }
+textarea.form-input { resize:none; min-height:68px; line-height:1.5; }
+.form-error { font-size:11px; color:var(--red); margin-top:5px; display:none; }
+.form-error.show { display:block; }
 
-  .settings-btn:active {
-    background: rgba(201,168,76,0.18);
-    border-color: rgba(201,168,76,0.6);
-    transform: scale(0.93);
-  }
+/* ── MODE TOGGLE ── */
+.mode-toggle {
+  display:flex; background:var(--surface2);
+  border-radius:16px; padding:4px; gap:4px;
+  border:1.5px solid var(--border2);
+}
+.mode-btn {
+  flex:1; padding:10px 8px; border-radius:12px;
+  border:none; background:transparent;
+  color:var(--muted); font-family:'Sora',sans-serif;
+  cursor:pointer; transition:all 0.15s;
+  text-align:center; line-height:1.3;
+}
+.mode-btn .mode-title {
+  font-size:13px; font-weight:700; display:block;
+}
+.mode-btn .mode-sub {
+  font-size:10px; font-weight:500; display:block; margin-top:2px; opacity:0.7;
+}
+.mode-btn.active { background:var(--surface3); }
+.mode-btn.active.out { color:var(--red); }
+.mode-btn.active.in  { color:var(--green); }
 
-  .settings-btn svg {
-    width: 18px;
-    height: 18px;
-    stroke: var(--gold);
-    opacity: 0.8;
-    transition: opacity 0.2s;
-  }
+/* ── SYNC ROW ── */
+.sync-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 14px; background:var(--surface2);
+  border:1.5px solid var(--border2); border-radius:12px;
+}
+.sync-row.disabled { opacity:0.4; pointer-events:none; }
+.sync-label { display:flex; flex-direction:column; gap:3px; flex:1; min-width:0; }
+.sync-label-text { font-size:13px; font-weight:600; }
+.sync-label-sub  { font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
 
-  /* ── MAIN CARD ── */
-  .card-wrap {
-    flex: 1;
-    width: 100%;
-    padding: 8px 16px 20px;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    z-index: 1;
-  }
+/* toggle switch */
+.toggle-input { display:none; }
+.toggle-track {
+  width:44px; height:26px; border-radius:13px;
+  background:var(--surface3); border:1.5px solid var(--border2);
+  cursor:pointer; position:relative; transition:background 0.2s, border-color 0.2s;
+  flex-shrink:0;
+}
+.toggle-track.on { background:var(--accent); border-color:var(--accent); }
+.toggle-thumb {
+  position:absolute; top:3px; left:3px;
+  width:18px; height:18px; border-radius:50%;
+  background:#fff; transition:transform 0.2s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle-track.on .toggle-thumb { transform:translateX(18px); }
 
-  .card {
-    flex: 1;
-    border-radius: 28px;
-    padding: 2px;
-    background: linear-gradient(145deg,
-      rgba(201,168,76,0.7) 0%,
-      rgba(232,201,122,0.4) 20%,
-      rgba(139,105,20,0.3) 40%,
-      rgba(201,168,76,0.5) 60%,
-      rgba(245,230,184,0.5) 80%,
-      rgba(201,168,76,0.6) 100%
-    );
-    box-shadow:
-      0 0 40px rgba(201,168,76,0.12),
-      0 20px 60px rgba(0,0,0,0.6),
-      inset 0 1px 0 rgba(245,230,184,0.3);
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-  }
+/* ── GH TEST RESULT ── */
+#gh-test-result.ok  { background:rgba(61,214,140,0.1); border:1.5px solid var(--green); color:var(--green); }
+#gh-test-result.err { background:rgba(255,77,109,0.1); border:1.5px solid var(--red);   color:var(--red);   }
 
-  .card-inner {
-    flex: 1;
-    border-radius: 26px;
-    background: linear-gradient(160deg,
-      #111008 0%,
-      #0e0d08 30%,
-      #0c0b06 60%,
-      #100f09 100%
-    );
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-    min-height: 0;
-  }
+/* ── FILTER ACTIVE BAR ── */
+#filter-bar-active {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 16px;
+  background:rgba(0,200,212,0.08);
+  border-bottom:1px solid rgba(0,200,212,0.25);
+  animation:slideDown 0.2s ease;
+}
+@keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+#filter-bar-active.visible { display:flex; }
+#filter-bar-label {
+  font-size:11px; font-weight:700;
+  color:var(--accent); font-family:'JetBrains Mono',monospace;
+  letter-spacing:0.5px;
+}
+#filter-bar-clear {
+  font-size:11px; font-weight:700;
+  color:var(--accent); background:rgba(0,200,212,0.15);
+  border:1.5px solid rgba(0,200,212,0.35); border-radius:50px;
+  padding:4px 12px; cursor:pointer; font-family:'Sora',sans-serif;
+  transition:all 0.15s;
+}
+#filter-bar-clear:hover  { background:rgba(0,200,212,0.28); }
+#filter-bar-clear:active { transform:scale(0.93); }
 
-  /* Gold shimmer overlay */
-  .card-inner::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 120px;
-    background: linear-gradient(180deg, rgba(201,168,76,0.06) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-    border-radius: 26px 26px 0 0;
-  }
+/* ── FILTER BAR ── */
+.filter-section-label {
+  font-size:10px; font-weight:700; text-transform:uppercase;
+  letter-spacing:1px; color:var(--muted);
+  font-family:'JetBrains Mono',monospace; padding:4px 0 8px;
+}
+.filter-opt {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 14px; background:var(--surface2);
+  border-radius:12px; cursor:pointer;
+  border:1.5px solid var(--border2); transition:all 0.15s;
+  margin-bottom:7px; user-select:none;
+}
+.filter-opt.selected-out { border-color:var(--red);   background:rgba(255,77,109,0.07); }
+.filter-opt.selected-in  { border-color:var(--green); background:rgba(61,214,140,0.07); }
+.filter-opt-dot  { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+.filter-opt-name { font-size:14px; font-weight:600; flex:1; }
+.filter-opt-cnt  { font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+.filter-opt-check {
+  width:20px; height:20px; border-radius:50%;
+  border:2px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:700; flex-shrink:0; transition:all 0.15s;
+}
+.filter-opt.selected-out .filter-opt-check { border-color:var(--red);   background:var(--red);   color:#fff; }
+.filter-opt.selected-in  .filter-opt-check { border-color:var(--green); background:var(--green); color:#fff; }
 
-  /* ── DATE STRIP ── */
-  .date-strip {
-    padding: 14px 22px 8px;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
-  }
+/* ── GROUP PILL SELECTOR ── */
+.group-pill-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.group-pill-sel {
+  padding:7px 14px; border-radius:50px;
+  border:1.5px solid var(--border2); background:var(--surface2);
+  color:var(--muted); font-size:13px; font-weight:600;
+  font-family:'Sora',sans-serif; cursor:pointer;
+  transition:all 0.15s; white-space:nowrap;
+}
+.group-pill-sel:active { transform:scale(0.93); }
+.group-pill-sel.active { background:rgba(0,200,212,0.15); border-color:var(--accent); color:var(--accent); }
+.group-pill-sel.add-group-btn { border-style:dashed; }
+.group-pill-sel.add-group-btn:hover { border-color:var(--accent); color:var(--accent); }
+.add-group-inline { display:none; align-items:center; gap:8px; width:100%; margin-top:4px; }
+.add-group-inline.show { display:flex; }
+.add-group-inline input {
+  flex:1; background:var(--surface2);
+  border:1.5px solid var(--accent); border-radius:10px;
+  color:var(--text); font-family:'Sora',sans-serif;
+  font-size:13px; padding:8px 12px; outline:none; -webkit-appearance:none;
+}
+.add-group-inline button {
+  padding:8px 14px; border-radius:50px;
+  background:var(--accent); border:none;
+  color:#0d1117; font-size:12px; font-weight:700;
+  font-family:'Sora',sans-serif; cursor:pointer; white-space:nowrap;
+}
 
-  .date-label {
-    font-family: 'DM Serif Display', serif;
-    font-style: italic;
-    font-size: 12px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold);
-    opacity: 0.5;
-  }
+/* ── COLOUR SWATCHES ── */
+.color-swatches { display:flex; gap:10px; }
+.color-swatch {
+  flex:1; padding:10px 6px; border-radius:12px;
+  cursor:pointer; border:2px solid transparent;
+  transition:all 0.15s;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+}
+.color-swatch:active { transform:scale(0.94); }
+.color-swatch[data-color="red"]    { background:rgba(255,77,109,0.12); }
+.color-swatch[data-color="yellow"] { background:rgba(247,201,72,0.12); }
+.color-swatch[data-color="green"]  { background:rgba(61,214,140,0.12); }
+.color-swatch[data-color="red"].selected    { border-color:var(--red); }
+.color-swatch[data-color="yellow"].selected { border-color:var(--yellow); }
+.color-swatch[data-color="green"].selected  { border-color:var(--green); }
+.swatch-dot { width:20px; height:20px; border-radius:50%; }
+.swatch-label { font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; letter-spacing:0.3px; }
 
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.15) 70%, transparent);
-    margin: 8px 0 0;
-  }
+/* ── IMPORT TOGGLE ── */
+.import-mode-toggle {
+  display:flex; background:var(--surface2);
+  border-radius:50px; padding:3px; gap:3px;
+  border:1.5px solid var(--border2);
+}
+.import-mode-btn {
+  flex:1; padding:8px 12px; border-radius:50px;
+  border:none; background:transparent;
+  color:var(--muted); font-size:13px; font-weight:600;
+  font-family:'Sora',sans-serif; cursor:pointer; transition:all 0.15s;
+}
+.import-mode-btn.active { background:var(--surface3); color:var(--text); }
 
-  /* ── TEXTAREA ── */
-  .strategy-area {
-    flex: 1;
-    padding: 16px 22px 22px;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    position: relative;
-    z-index: 1;
-  }
+/* ── BUTTONS ── */
+.btn-primary {
+  width:100%; padding:14px;
+  background:var(--accent); border:none; border-radius:50px;
+  color:#0d1117; font-family:'Sora',sans-serif;
+  font-size:15px; font-weight:800;
+  cursor:pointer; transition:background 0.15s, transform 0.1s;
+  box-shadow:0 4px 20px rgba(0,200,212,0.35); letter-spacing:0.3px;
+}
+.btn-primary:hover  { background:var(--accent2); }
+.btn-primary:active { transform:scale(0.97); }
+.btn-danger {
+  width:100%; padding:14px;
+  background:rgba(255,77,109,0.12); border:1.5px solid var(--red); border-radius:50px;
+  color:var(--red); font-family:'Sora',sans-serif;
+  font-size:15px; font-weight:800; cursor:pointer; transition:all 0.15s;
+}
+.btn-danger:hover  { background:rgba(255,77,109,0.22); }
+.btn-danger:active { transform:scale(0.97); }
 
-  .strategy-textarea {
-    flex: 1;
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    resize: none;
-    color: rgba(245,230,184,0.88);
-    font-family: var(--font);
-    font-size: var(--font-size);
-    font-weight: 300;
-    line-height: 1.75;
-    letter-spacing: 0.01em;
-    caret-color: var(--gold-light);
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(201,168,76,0.2) transparent;
-    touch-action: pan-y;
-  }
+/* ── INFO ── */
+.info-section { margin-bottom:14px; }
+.info-section h3 { font-size:10px; font-weight:700; color:var(--accent); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; font-family:'JetBrains Mono',monospace; }
+.info-section p, .info-section li { font-size:13px; color:var(--muted); line-height:1.65; }
+.info-section ul { padding-left:16px; }
+.info-section li { margin-bottom:4px; }
+.color-legend { display:flex; gap:10px; margin-top:8px; }
+.color-legend-item { flex:1; padding:10px; border-radius:10px; display:flex; flex-direction:column; align-items:center; gap:5px; }
+.cl-dot { width:12px; height:12px; border-radius:50%; }
+.cl-label { font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; }
 
-  .strategy-textarea::-webkit-scrollbar {
-    width: 3px;
-  }
-  .strategy-textarea::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .strategy-textarea::-webkit-scrollbar-thumb {
-    background: rgba(201,168,76,0.25);
-    border-radius: 2px;
-  }
+/* ── TOAST ── */
+#toast {
+  position:fixed; bottom:calc(var(--footer-h) + 14px);
+  left:50%; transform:translateX(-50%) translateY(12px);
+  background:var(--surface3); border:1.5px solid var(--border2);
+  color:var(--text); font-size:13px; font-weight:600;
+  padding:10px 18px; border-radius:50px;
+  z-index:500; opacity:0; transition:opacity 0.2s, transform 0.2s;
+  pointer-events:none; white-space:nowrap;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-  .strategy-textarea::placeholder {
-    color: rgba(201,168,76,0.22);
-    font-style: italic;
-    font-weight: 300;
-  }
-
-  /* ── CHAR COUNT ── */
-  .char-count {
-    flex-shrink: 0;
-    text-align: right;
-    font-family: 'DM Serif Display', serif;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: rgba(201,168,76,0.28);
-    padding-top: 6px;
-    user-select: none;
-  }
-
-  /* ── SETTINGS PANEL ── */
-  .settings-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: flex-end;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .settings-overlay.open {
-    pointer-events: all;
-    opacity: 1;
-  }
-
-  .settings-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.65);
-    backdrop-filter: blur(4px);
-  }
-
-  .settings-sheet {
-    position: relative;
-    width: 100%;
-    background: linear-gradient(170deg, #141209 0%, #0e0c07 100%);
-    border-top: 1px solid rgba(201,168,76,0.3);
-    border-radius: 24px 24px 0 0;
-    padding: 0 24px 40px;
-    transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-    box-shadow: 0 -20px 60px rgba(0,0,0,0.8);
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-
-  .settings-overlay.open .settings-sheet {
-    transform: translateY(0);
-  }
-
-  .sheet-handle {
-    width: 36px;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(201,168,76,0.25);
-    margin: 12px auto 20px;
-  }
-
-  .sheet-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--gold);
-    opacity: 0.6;
-    margin-bottom: 20px;
-  }
-
-  .section-label {
-    font-family: 'DM Serif Display', serif;
-    font-style: italic;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    color: rgba(201,168,76,0.45);
-    margin-bottom: 12px;
-    text-transform: uppercase;
-  }
-
-  /* Font options */
-  .font-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-
-  .font-option {
-    border: 1px solid rgba(201,168,76,0.15);
-    border-radius: 12px;
-    padding: 12px 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: rgba(201,168,76,0.03);
-    touch-action: manipulation;
-  }
-
-  .font-option:active {
-    transform: scale(0.97);
-  }
-
-  .font-option.active {
-    border-color: rgba(201,168,76,0.55);
-    background: rgba(201,168,76,0.1);
-    box-shadow: 0 0 16px rgba(201,168,76,0.08);
-  }
-
-  .font-name {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: rgba(201,168,76,0.45);
-    margin-bottom: 4px;
-  }
-
-  .font-option.active .font-name {
-    color: rgba(201,168,76,0.7);
-  }
-
-  .font-preview {
-    font-size: 18px;
-    color: rgba(245,230,184,0.75);
-    line-height: 1.2;
-  }
-
-  /* Font size slider */
-  .size-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 8px;
-  }
-
-  .size-label-small {
-    font-family: 'DM Serif Display', serif;
-    font-size: 13px;
-    color: rgba(201,168,76,0.4);
-    flex-shrink: 0;
-    width: 20px;
-    text-align: center;
-  }
-
-  .size-label-large {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    color: rgba(201,168,76,0.4);
-    flex-shrink: 0;
-    width: 24px;
-    text-align: center;
-  }
-
-  .size-slider {
-    flex: 1;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 2px;
-    background: linear-gradient(90deg, var(--gold) var(--pct, 40%), rgba(201,168,76,0.15) var(--pct, 40%));
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  .size-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, var(--gold-light), var(--gold));
-    box-shadow: 0 0 10px rgba(201,168,76,0.4);
-    cursor: pointer;
-  }
-
-  .size-value {
-    font-family: 'DM Serif Display', serif;
-    font-size: 12px;
-    color: rgba(201,168,76,0.5);
-    flex-shrink: 0;
-    width: 34px;
-    text-align: right;
-  }
-
-  /* Close btn */
-  .close-btn {
-    width: 100%;
-    margin-top: 22px;
-    padding: 15px;
-    border: 1px solid rgba(201,168,76,0.25);
-    border-radius: 14px;
-    background: rgba(201,168,76,0.06);
-    color: var(--gold);
-    font-family: 'DM Serif Display', serif;
-    font-size: 13px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    touch-action: manipulation;
-  }
-
-  .close-btn:active {
-    background: rgba(201,168,76,0.14);
-    transform: scale(0.98);
-  }
-
-  /* Safe area */
-  @supports (padding-bottom: env(safe-area-inset-bottom)) {
-    .card-wrap { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
-    .settings-sheet { padding-bottom: max(40px, env(safe-area-inset-bottom)); }
-    .header { padding-top: max(28px, calc(env(safe-area-inset-top) + 14px)); }
-  }
+/* ── DESKTOP ── */
+@media (min-width:600px) {
+  .modal { border-radius:24px; margin-bottom:40px; max-height:86dvh; }
+  .modal-backdrop { align-items:center; }
+  header, footer { padding-left:24px; padding-right:24px; }
+  main { padding:16px 20px 6px; }
+}
 </style>
 </head>
 <body>
+<div id="app">
 
-<!-- Mode Popup -->
-<div class="mode-popup" id="modePopup">
-  <div class="mode-option" id="modeNone" onclick="setMode('none')">
-    <span class="mode-icon">¶</span>
-    <span class="mode-label">Free Write</span>
+  <header>
+    <button id="logo-btn" onclick="openModal('info-modal')" aria-label="About">
+      <div class="logo-icon">📌</div>
+      <span class="logo-text">Reminders</span>
+    </button>
+    <div class="header-right">
+
+      <button class="pill-btn" onclick="openModal('filter-modal')">
+        <svg width="13" height="13" viewBox="0 0 15 15" fill="none">
+          <path d="M1 3h13M3 7.5h9M5.5 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Filter
+      </button>
+      <button class="pill-btn primary" onclick="openAddModal(null)">+ Add</button>
+    </div>
+  </header>
+
+  <div id="filter-bar-active">
+    <span id="filter-bar-label">● Filtered</span>
+    <button id="filter-bar-clear" onclick="clearFilter()">Clear ✕</button>
   </div>
-  <div class="mode-divider"></div>
-  <div class="mode-option" id="modeBullet" onclick="setMode('bullet')">
-    <span class="mode-icon">•</span>
-    <span class="mode-label">Bullet Points</span>
-  </div>
-  <div class="mode-divider"></div>
-  <div class="mode-option" id="modeNumber" onclick="setMode('number')">
-    <span class="mode-icon">1.</span>
-    <span class="mode-label">Numbered List</span>
-  </div>
+
+  <main id="main-list">
+    <div id="empty">
+      <div class="em-icon">🗒️</div>
+      <p>No reminders yet.<br>Tap <strong>+ Add</strong> to get started.</p>
+    </div>
+  </main>
+
+  <footer>
+    <span class="footer-stat" id="footer-stat">0 reminders</span>
+    <div class="footer-actions">
+      <button class="footer-btn" onclick="exportData()">⬇ Export</button>
+      <button class="footer-btn" onclick="openImportModal()">⬆ Import</button>
+    </div>
+  </footer>
 </div>
 
-<!-- Header -->
-<div class="header">
-  <div class="logo">Morning <span>Strategise</span></div>
-
-  <!-- Mode Button -->
-  <button class="mode-btn" onclick="toggleModePopup()" aria-label="List mode">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="8" y1="6" x2="21" y2="6"/>
-      <line x1="8" y1="12" x2="21" y2="12"/>
-      <line x1="8" y1="18" x2="21" y2="18"/>
-      <circle cx="3" cy="6" r="1" fill="currentColor" stroke="none"/>
-      <circle cx="3" cy="12" r="1" fill="currentColor" stroke="none"/>
-      <circle cx="3" cy="18" r="1" fill="currentColor" stroke="none"/>
-    </svg>
-  </button>
-
-  <button class="settings-btn" onclick="openSettings()" aria-label="Settings">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-    </svg>
-  </button>
-</div>
-
-<!-- Main Card -->
-<div class="card-wrap">
-  <div class="card">
-    <div class="card-inner">
-      <div class="date-strip">
-        <div class="date-label" id="dateLabel"></div>
-        <div class="divider"></div>
-      </div>
-      <div class="strategy-area">
-        <textarea
-          class="strategy-textarea"
-          id="strategyText"
-          placeholder="Write your strategy for tomorrow…"
-          spellcheck="true"
-          autocorrect="on"
-          autocapitalize="sentences"
-        ></textarea>
-        <div class="char-count" id="charCount">0 words</div>
+<!-- ══ ADD MODAL ══ -->
+<div class="modal-backdrop" id="add-modal" onclick="backdropClose(event,'add-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">New Reminder</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="modal-close" style="font-size:13px" onclick="openModal('settings-modal')" aria-label="Settings">⚙️</button>
+        <button class="modal-close" style="font-size:13px" onclick="openModal('info-modal')" aria-label="Help">ℹ️</button>
+        <button class="modal-close" onclick="closeModal('add-modal')" aria-label="Close">✕</button>
       </div>
     </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Who is this for? *</label>
+        <div class="group-pill-row" id="name-pill-row"></div>
+        <div class="add-group-inline" id="add-name-inline">
+          <input type="text" id="new-name-input" placeholder="Your name…" autocorrect="off" autocapitalize="words" spellcheck="false"
+            onkeydown="if(event.key==='Enter')confirmNewName()">
+          <button onclick="confirmNewName()">Add</button>
+        </div>
+        <div class="form-error" id="name-error">Please select or add a name</div>
+      </div>
+      <div class="form-group">
+        <label>Reminder *</label>
+        <input class="form-input" id="input-title" type="text" placeholder="What do you need to remember?" autocorrect="off">
+        <div class="form-error" id="title-error">Reminder text is required</div>
+      </div>
+      <div class="form-group">
+        <label>Note <span style="font-weight:400;opacity:0.5;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="form-input" id="input-note" placeholder="Extra details…" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Group</label>
+        <div class="group-pill-row" id="group-pill-row"></div>
+        <div class="add-group-inline" id="add-group-inline">
+          <input type="text" id="new-group-input" placeholder="Group name…" autocorrect="off"
+            onkeydown="if(event.key==='Enter')confirmNewGroup()">
+          <button onclick="confirmNewGroup()">Add</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <div class="color-swatches" id="color-swatches"></div>
+      </div>
+      <!-- Sync toggle -->
+      <div id="sync-row" class="sync-row">
+        <label class="sync-label" for="sync-enabled">
+          <span class="sync-label-text">Enable GitHub Sync</span>
+          <span class="sync-label-sub" id="sync-sub">Configure in ⚙️ Settings first</span>
+        </label>
+        <div class="toggle-wrap">
+          <input type="checkbox" id="sync-enabled" class="toggle-input">
+          <div class="toggle-track" onclick="toggleSync()"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="addReminder()">+ Add Reminder</button>
+    </div>
   </div>
 </div>
 
-<!-- Settings Panel -->
-<div class="settings-overlay" id="settingsOverlay">
-  <div class="settings-backdrop" onclick="closeSettings()"></div>
-  <div class="settings-sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">Preferences</div>
-
-    <div class="section-label">Typeface</div>
-    <div class="font-grid" id="fontGrid">
-      <!-- populated by JS -->
+<!-- ══ EDIT MODAL ══ -->
+<div class="modal-backdrop" id="edit-modal" onclick="backdropClose(event,'edit-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Edit Reminder</span>
+      <button class="modal-close" onclick="closeModal('edit-modal')" aria-label="Close">✕</button>
     </div>
-
-    <div class="section-label">Size</div>
-    <div class="size-row">
-      <span class="size-label-small">A</span>
-      <input type="range" class="size-slider" id="sizeSlider" min="13" max="24" value="17" oninput="onSizeChange(this)">
-      <span class="size-label-large">A</span>
-      <span class="size-value" id="sizeValue">17px</span>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Reminder *</label>
+        <input class="form-input" id="edit-title" type="text" placeholder="What do you need to remember?" autocorrect="off">
+        <div class="form-error" id="edit-title-error">Reminder text is required</div>
+      </div>
+      <div class="form-group">
+        <label>Note <span style="font-weight:400;opacity:0.5;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="form-input" id="edit-note" placeholder="Extra details…" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Group</label>
+        <div class="group-pill-row" id="edit-group-pill-row"></div>
+        <div class="add-group-inline" id="edit-add-group-inline">
+          <input type="text" id="edit-new-group-input" placeholder="Group name…" autocorrect="off"
+            onkeydown="if(event.key==='Enter')confirmEditNewGroup()">
+          <button onclick="confirmEditNewGroup()">Add</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <div class="color-swatches" id="edit-color-swatches"></div>
+      </div>
+      <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
+      <button class="btn-danger" onclick="deleteFromEdit()">Delete Reminder</button>
     </div>
-
-    <button class="close-btn" onclick="closeSettings()">Done</button>
   </div>
 </div>
+
+<!-- ══ FILTER MODAL ══ -->
+<div class="modal-backdrop" id="filter-modal" onclick="backdropClose(event,'filter-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Filter</span>
+      <button class="modal-close" onclick="closeModal('filter-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body" id="filter-modal-body"></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS MODAL ══ -->
+<div class="modal-backdrop" id="settings-modal" onclick="backdropClose(event,'settings-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">GitHub Sync</span>
+      <button class="modal-close" onclick="closeModal('settings-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Personal Access Token</label>
+        <input class="form-input" id="gh-token" type="password" placeholder="ghp_…" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
+      </div>
+      <div class="form-group">
+        <label>Repository</label>
+        <input class="form-input" id="gh-repo" type="text" placeholder="owner/repo" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
+      </div>
+      <div class="form-group">
+        <label>File path</label>
+        <input class="form-input" id="gh-path" type="text" placeholder="reminders.json" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
+      </div>
+      <div class="form-group">
+        <label>Branch</label>
+        <input class="form-input" id="gh-branch" type="text" placeholder="main" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn-primary" style="flex:1;padding:12px;font-size:13px" onclick="saveGHSettings()">Save</button>
+        <button class="btn-primary" style="flex:1;padding:12px;font-size:13px;background:var(--surface3);border:1.5px solid var(--border2);color:var(--muted);box-shadow:none" onclick="testGHSettings()">Test</button>
+      </div>
+
+      <div id="gh-test-result" style="display:none;padding:10px 14px;border-radius:10px;font-size:12px;font-family:'JetBrains Mono',monospace;line-height:1.5"></div>
+
+      <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:4px">
+        Token needs <strong>Contents: Read &amp; Write</strong> on your repo.<br>
+        Go to GitHub → Settings → Developer settings → Fine-grained tokens.
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-backdrop" id="import-modal" onclick="backdropClose(event,'import-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Import</span>
+      <button class="modal-close" onclick="closeModal('import-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Import mode</label>
+        <div class="import-mode-toggle">
+          <button class="import-mode-btn active" id="import-merge-btn" onclick="setImportMode('merge')">Merge</button>
+          <button class="import-mode-btn" id="import-overwrite-btn" onclick="setImportMode('overwrite')">Overwrite</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5" id="import-mode-desc">
+          Adds new reminders from the file. Existing ones are kept — no duplicates.
+        </p>
+      </div>
+      <button class="btn-primary" onclick="triggerImport()">Choose File</button>
+      <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+  </div>
+</div>
+
+<!-- ══ INFO MODAL ══ -->
+<div class="modal-backdrop" id="info-modal" onclick="backdropClose(event,'info-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">About</span>
+      <button class="modal-close" onclick="closeModal('info-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-section">
+        <h3>What is this?</h3>
+        <p>A local reminder app — everything saved in your browser, no accounts needed.</p>
+      </div>
+      <div class="info-section">
+        <h3>Priority colours</h3>
+        <div class="color-legend">
+          <div class="color-legend-item" style="background:rgba(255,77,109,0.12);border:1.5px solid var(--red)">
+            <div class="cl-dot" style="background:var(--red)"></div>
+            <span class="cl-label" style="color:var(--red)">URGENT</span>
+          </div>
+          <div class="color-legend-item" style="background:rgba(247,201,72,0.12);border:1.5px solid var(--yellow)">
+            <div class="cl-dot" style="background:var(--yellow)"></div>
+            <span class="cl-label" style="color:var(--yellow)">MEDIUM</span>
+          </div>
+          <div class="color-legend-item" style="background:rgba(61,214,140,0.12);border:1.5px solid var(--green)">
+            <div class="cl-dot" style="background:var(--green)"></div>
+            <span class="cl-label" style="color:var(--green)">LOW</span>
+          </div>
+        </div>
+        <p style="margin-top:10px">Red sorts to top, green to bottom. Done items sink — tap ✕ to clear, or tap circle again to restore.</p>
+      </div>
+      <div class="info-section">
+        <h3>Filtering</h3>
+        <ul>
+          <li><strong>Filter Out</strong> — all boxes start unticked. Tick the people or groups you want to <em>hide</em>.</li>
+          <li><strong>Filter In</strong> — all boxes start ticked. Untick the people or groups you want to <em>remove</em> from view.</li>
+          <li>People and groups work as an AND condition — both must match to be affected.</li>
+          <li>Tap <strong>Filtered ✕</strong> in the header to clear instantly.</li>
+        </ul>
+      </div>
+      <div class="info-section">
+        <h3>Groups</h3>
+        <p>General is always the default. Add custom groups in the add modal — they persist across sessions. Tap the <strong>+</strong> on any group card to quickly add to that group.</p>
+      </div>
+      <div class="info-section">
+        <h3>Export / Import</h3>
+        <p>Export saves a <code>.json</code> backup. Import can merge (add new) or overwrite (replace all).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <script>
-  // ── DATA ──
-  const FONTS = [
-    { id: 'cormorant', name: 'Cormorant', family: "'Cormorant Garamond', serif", preview: 'Strategy' },
-    { id: 'playfair',  name: 'Playfair',  family: "'Playfair Display', serif",   preview: 'Strategy' },
-    { id: 'lora',      name: 'Lora',      family: "'Lora', serif",               preview: 'Strategy' },
-    { id: 'baskerville', name: 'Baskerville', family: "'Libre Baskerville', serif", preview: 'Strategy' },
-    { id: 'spectral',  name: 'Spectral',  family: "'Spectral', serif",           preview: 'Strategy' },
-    { id: 'crimson',   name: 'Crimson',   family: "'Crimson Pro', serif",        preview: 'Strategy' },
-  ];
+// ── COLOURS ───────────────────────────────────────────────────
+const COLORS = [
+  {id:'red',    hex:'#ff4d6d', label:'Urgent', order:0},
+  {id:'yellow', hex:'#f7c948', label:'Medium', order:1},
+  {id:'green',  hex:'#3dd68c', label:'Low',    order:2},
+];
+function getColor(id) { return COLORS.find(c=>c.id===id)||COLORS[2]; }
 
-  // ── STATE ──
-  let currentFont = localStorage.getItem('ms_font') || 'cormorant';
-  let currentSize = parseInt(localStorage.getItem('ms_size') || '17');
+// ── STATE ─────────────────────────────────────────────────────
+let reminders    = safeJSON('reminders', []);
+let groups       = safeJSON('reminder_groups', ['General']);
+if (!groups.includes('General')) groups.unshift('General');
+let names        = safeJSON('reminder_names', []);
+// Seed names from existing reminders
+reminders.forEach(r=>{ if(r.author && !names.includes(r.author)) names.push(r.author); });
 
-  // ── ELEMENTS ──
-  const textarea    = document.getElementById('strategyText');
-  const charCount   = document.getElementById('charCount');
-  const dateLabel   = document.getElementById('dateLabel');
-  const sizeSlider  = document.getElementById('sizeSlider');
-  const sizeValue   = document.getElementById('sizeValue');
-  const fontGrid    = document.getElementById('fontGrid');
-  const overlay     = document.getElementById('settingsOverlay');
+let activeFilter  = safeJSON('reminder_filter', {mode:'out', people:[], groups:[]});
+let selectedColor = 'green';
+let selectedGroup = 'General';
+let selectedName  = names.length===1 ? names[0] : (localStorage.getItem('reminder_name')||'');
+let importMode    = 'merge';
 
-  // ── INIT ──
-  function init() {
-    setDate();
-    buildFontGrid();
-    applyFont(currentFont);
-    applySize(currentSize);
+// tmp filter state while modal open
+let tmpFilter = {mode:'out', people:[], groups:[]};
 
-    const saved = localStorage.getItem('ms_strategy') || '';
-    textarea.value = saved;
-    updateWordCount();
+function safeJSON(k,fb){ try{const v=JSON.parse(localStorage.getItem(k)); return v!==null?v:fb;}catch(e){return fb;} }
+function save()       { localStorage.setItem('reminders', JSON.stringify(reminders)); }
+function saveGroups() { localStorage.setItem('reminder_groups', JSON.stringify(groups)); }
+function saveNames()  { localStorage.setItem('reminder_names', JSON.stringify(names)); }
+function saveFilter() { localStorage.setItem('reminder_filter', JSON.stringify(activeFilter)); }
 
-    textarea.addEventListener('input', () => {
-      localStorage.setItem('ms_strategy', textarea.value);
-      updateWordCount();
+// ── FILTER ────────────────────────────────────────────────────
+function isFiltered() {
+  return activeFilter.people.length > 0 || activeFilter.groups.length > 0;
+}
+
+function passesFilter(r) {
+  if (!isFiltered()) return true;
+  const {mode, people, groups:fg} = activeFilter;
+  const personMatch = people.length===0 || people.includes(r.author||'');
+  const groupMatch  = fg.length===0     || fg.includes(r.group||'General');
+  let selected;
+  if (people.length>0 && fg.length>0) selected = personMatch && groupMatch;
+  else if (people.length>0) selected = personMatch;
+  else selected = groupMatch;
+  return mode==='out' ? !selected : selected;
+}
+
+function clearFilter() {
+  activeFilter.people = [];
+  activeFilter.groups = [];
+  saveFilter(); render();
+}
+
+// ── SORT ──────────────────────────────────────────────────────
+function sorted(list) {
+  const undone = list.filter(r=>!r.done).sort((a,b)=>{
+    const ca=getColor(a.color).order, cb=getColor(b.color).order;
+    if(ca!==cb) return ca-cb;
+    return a.created-b.created;
+  });
+  return [...undone, ...list.filter(r=>r.done)];
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function render() {
+  const list  = document.getElementById('main-list');
+  const empty = document.getElementById('empty');
+  Array.from(list.querySelectorAll('.group-card')).forEach(c=>c.remove());
+
+  const vis = sorted(reminders.filter(passesFilter));
+  empty.style.display = vis.length===0 ? 'flex' : 'none';
+
+  if (vis.length > 0) {
+    const grouped = {};
+    vis.forEach(r => {
+      const g = r.group||'General';
+      if (!grouped[g]) grouped[g] = [];
+      grouped[g].push(r);
     });
 
-    updateModeUI();
-    modePopup.style.display = 'none';
+    const keys = Object.keys(grouped).sort((a,b)=>{
+      if(a==='General') return -1;
+      if(b==='General') return 1;
+      return a.localeCompare(b);
+    });
 
-    // Update slider fill on load
-    updateSliderFill(sizeSlider);
-  }
+    keys.forEach(g => {
+      const card = document.createElement('div');
+      card.className = 'group-card'+(g==='General'?' general-card':'');
 
-  function setDate() {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(now.getDate() + 1);
-    const opts = { weekday: 'long', month: 'long', day: 'numeric' };
-    dateLabel.textContent = 'Strategy for ' + tomorrow.toLocaleDateString('en-GB', opts);
-  }
+      if (g !== 'General') {
+        const hdr = document.createElement('div');
+        hdr.className = 'group-card-header';
+        hdr.innerHTML = `
+          <span class="group-card-title">${esc(g)}</span>
+          <span class="group-card-badge">${grouped[g].length}</span>
+          <button class="group-add-btn" title="Add to ${esc(g)}">+</button>
+        `;
+        hdr.querySelector('.group-add-btn').onclick = () => openAddModal(g);
+        card.appendChild(hdr);
+      }
 
-  function updateWordCount() {
-    const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0);
-    const count = textarea.value.trim() === '' ? 0 : words.length;
-    charCount.textContent = count === 1 ? '1 word' : count + ' words';
-  }
-
-  // ── FONT GRID ──
-  function buildFontGrid() {
-    fontGrid.innerHTML = '';
-    FONTS.forEach(f => {
-      const el = document.createElement('div');
-      el.className = 'font-option' + (f.id === currentFont ? ' active' : '');
-      el.innerHTML = `<div class="font-name">${f.name}</div><div class="font-preview" style="font-family:${f.family}">${f.preview}</div>`;
-      el.addEventListener('click', () => selectFont(f.id));
-      fontGrid.appendChild(el);
+      const wrap = document.createElement('div');
+      wrap.className = 'group-pills';
+      grouped[g].forEach(r => wrap.appendChild(makePill(r)));
+      card.appendChild(wrap);
+      list.appendChild(card);
     });
   }
 
-  function selectFont(id) {
-    currentFont = id;
-    localStorage.setItem('ms_font', id);
-    applyFont(id);
-    document.querySelectorAll('.font-option').forEach((el, i) => {
-      el.classList.toggle('active', FONTS[i].id === id);
-    });
+  const done = reminders.filter(r=>r.done).length;
+  document.getElementById('footer-stat').textContent =
+    `${reminders.length} reminder${reminders.length!==1?'s':''} · ${done} done`;
+
+  document.getElementById('filter-bar-active').classList.toggle('visible', isFiltered());
+}
+
+function makePill(r) {
+  const col = getColor(r.color);
+  const el  = document.createElement('div');
+  el.className = 'reminder-pill'+(r.done?' done':'');
+  el.style.setProperty('--pill-color', col.hex);
+  el.dataset.id = r.id;
+  el.onclick = (e) => handlePillTap(r.id, e);
+  el.innerHTML = `
+    <div class="pill-dot" style="background:${col.hex};box-shadow:0 0 7px ${col.hex}80"></div>
+    <div class="pill-check" onclick="toggleDone('${r.id}',event)">${r.done?'✓':''}</div>
+    <div class="pill-body">
+      <div class="pill-title">${esc(r.title)}</div>
+      ${r.note   ?`<div class="pill-note">${esc(r.note)}</div>`:''}
+      ${r.author ?`<div class="pill-author">@${esc(r.author)}</div>`:''}
+    </div>
+    <button class="pill-delete" onclick="deleteReminder('${r.id}',event)" aria-label="Delete">✕</button>
+  `;
+  return el;
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── ADD MODAL ─────────────────────────────────────────────────
+function openAddModal(presetGroup) {
+  selectedGroup = 'General'; // always default to General
+  if (presetGroup && groups.includes(presetGroup)) selectedGroup = presetGroup;
+  openModal('add-modal');
+}
+
+function populateAddModal() {
+  document.getElementById('input-title').value = '';
+  document.getElementById('input-note').value  = '';
+  document.getElementById('input-title').classList.remove('error');
+  document.getElementById('title-error').classList.remove('show');
+  document.getElementById('name-error').classList.remove('show');
+  document.getElementById('add-group-inline').classList.remove('show');
+  document.getElementById('new-group-input').value = '';
+  document.getElementById('add-name-inline').classList.remove('show');
+  document.getElementById('new-name-input').value = '';
+
+  renderNamePills();
+  renderGroupPills();
+  renderColorSwatches();
+
+  // Reset sync toggle state for this open
+  const cb = document.getElementById('sync-enabled');
+  delete cb.dataset.manuallySet;
+  cb.checked = ghConfigured();
+  document.querySelector('.toggle-track').classList.toggle('on', cb.checked);
+  updateSyncRow();
+
+  setTimeout(()=>document.getElementById('input-title').focus(), 320);
+}
+
+function renderNamePills() {
+  const row = document.getElementById('name-pill-row');
+  row.innerHTML = '';
+  names.forEach(n => {
+    const p = document.createElement('button');
+    p.className = 'group-pill-sel'+(n===selectedName?' active':'');
+    p.textContent = n;
+    p.onclick = () => {
+      selectedName = n;
+      localStorage.setItem('reminder_name', n);
+      document.querySelectorAll('#name-pill-row .group-pill-sel:not(.add-group-btn)').forEach(b=>b.classList.remove('active'));
+      p.classList.add('active');
+      document.getElementById('name-error').classList.remove('show');
+    };
+    row.appendChild(p);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'group-pill-sel add-group-btn';
+  addBtn.textContent = '+ Add Name';
+  addBtn.onclick = () => {
+    const inline = document.getElementById('add-name-inline');
+    inline.classList.toggle('show');
+    if (inline.classList.contains('show')) document.getElementById('new-name-input').focus();
+  };
+  row.appendChild(addBtn);
+}
+
+function confirmNewName() {
+  const input = document.getElementById('new-name-input');
+  const name  = input.value.trim();
+  if (!name || names.includes(name)) { input.value=''; return; }
+  names.push(name);
+  saveNames();
+  selectedName = name;
+  localStorage.setItem('reminder_name', name);
+  input.value = '';
+  document.getElementById('add-name-inline').classList.remove('show');
+  renderNamePills();
+}
+
+function renderGroupPills() {
+  const row = document.getElementById('group-pill-row');
+  row.innerHTML = '';
+  groups.forEach(g => {
+    const p = document.createElement('button');
+    p.className = 'group-pill-sel'+(g===selectedGroup?' active':'');
+    p.textContent = g;
+    p.onclick = () => {
+      selectedGroup = g;
+      document.querySelectorAll('.group-pill-sel:not(.add-group-btn)').forEach(b=>b.classList.remove('active'));
+      p.classList.add('active');
+    };
+    row.appendChild(p);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'group-pill-sel add-group-btn';
+  addBtn.textContent = '+ Add Group';
+  addBtn.onclick = () => {
+    const inline = document.getElementById('add-group-inline');
+    inline.classList.toggle('show');
+    if (inline.classList.contains('show')) document.getElementById('new-group-input').focus();
+  };
+  row.appendChild(addBtn);
+}
+
+function renderColorSwatches() {
+  const sw = document.getElementById('color-swatches');
+  sw.innerHTML = '';
+  COLORS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'color-swatch'+(c.id===selectedColor?' selected':'');
+    d.dataset.color = c.id; d.title = c.label;
+    d.innerHTML = `<div class="swatch-dot" style="background:${c.hex};box-shadow:0 0 10px ${c.hex}80"></div><span class="swatch-label" style="color:${c.hex}">${c.label.toUpperCase()}</span>`;
+    d.onclick = () => {
+      selectedColor = c.id;
+      document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+      d.classList.add('selected');
+    };
+    sw.appendChild(d);
+  });
+}
+
+function confirmNewGroup() {
+  const input = document.getElementById('new-group-input');
+  const name  = input.value.trim();
+  if (!name || groups.includes(name)) { input.value=''; return; }
+  groups.push(name);
+  saveGroups();
+  selectedGroup = name;
+  input.value = '';
+  document.getElementById('add-group-inline').classList.remove('show');
+  renderGroupPills();
+}
+
+function addReminder() {
+  const title = document.getElementById('input-title').value.trim();
+  let valid = true;
+
+  if (!selectedName) {
+    document.getElementById('name-error').classList.add('show');
+    valid = false;
+  } else {
+    document.getElementById('name-error').classList.remove('show');
+  }
+  document.getElementById('input-title').classList.toggle('error', !title);
+  document.getElementById('title-error').classList.toggle('show', !title);
+  if (!valid || !title) return;
+
+  const r = {
+    id:      Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    title,
+    note:    document.getElementById('input-note').value.trim(),
+    group:   selectedGroup,
+    color:   selectedColor,
+    author:  selectedName,
+    done:    false,
+    created: Date.now()
+  };
+  reminders.unshift(r);
+  save(); closeModal('add-modal'); render(); toast('Reminder added ✓');
+
+  if (syncEnabled()) {
+    ghPushAll()
+      .then(()=>toast('Synced to GitHub ✓'))
+      .catch(e=>{ console.warn('GitHub push failed',e); toast('Add OK — sync failed ✕'); });
+  }
+}
+
+// ── FILTER MODAL ──────────────────────────────────────────────
+function populateFilterModal() {
+  tmpFilter = {mode:activeFilter.mode, people:[...activeFilter.people], groups:[...activeFilter.groups]};
+  const body = document.getElementById('filter-modal-body');
+  body.innerHTML = '';
+
+  // Mode toggle
+  const modeWrap = document.createElement('div');
+  modeWrap.className = 'form-group';
+  modeWrap.innerHTML = `
+    <label>Mode</label>
+    <div class="mode-toggle">
+      <button class="mode-btn out ${tmpFilter.mode==='out'?'active':''}" id="fmode-out" onclick="setTmpMode('out')">
+        <span class="mode-title">Filter Out</span>
+        <span class="mode-sub">hide selected</span>
+      </button>
+      <button class="mode-btn in ${tmpFilter.mode==='in'?'active':''}" id="fmode-in" onclick="setTmpMode('in')">
+        <span class="mode-title">Filter In</span>
+        <span class="mode-sub">show selected</span>
+      </button>
+    </div>
+  `;
+  body.appendChild(modeWrap);
+
+  // People
+  const people = [...new Set(reminders.map(r=>r.author).filter(Boolean))];
+  if (people.length > 0) {
+    const lbl = document.createElement('div');
+    lbl.className='filter-section-label'; lbl.textContent='People';
+    body.appendChild(lbl);
+    people.forEach(p => body.appendChild(makeFilterOpt('person', p, p, reminders.filter(r=>r.author===p).length, personColor(p))));
   }
 
-  function applyFont(id) {
-    const f = FONTS.find(x => x.id === id) || FONTS[0];
-    document.documentElement.style.setProperty('--font', f.family);
+  // Groups
+  const glbl = document.createElement('div');
+  glbl.className='filter-section-label';
+  if (people.length>0) glbl.style.marginTop='8px';
+  glbl.textContent='Groups';
+  body.appendChild(glbl);
+  groups.forEach(g => body.appendChild(makeFilterOpt('group', g, g, reminders.filter(r=>(r.group||'General')===g).length, groupColor(g))));
+
+  // Actions
+  const actions = document.createElement('div');
+  actions.style.cssText='display:flex;gap:10px;margin-top:4px';
+  actions.innerHTML=`
+    <button class="btn-danger" style="flex:1;padding:12px;font-size:13px" onclick="clearFilter();closeModal('filter-modal')">Clear</button>
+    <button class="btn-primary" style="flex:2;padding:12px;font-size:13px" onclick="applyFilter()">Apply</button>
+  `;
+  body.appendChild(actions);
+}
+
+function makeFilterOpt(type, key, label, count, color) {
+  const list = type==='person' ? tmpFilter.people : tmpFilter.groups;
+  const sel  = list.includes(key);
+  const d    = document.createElement('div');
+  d.className = 'filter-opt'+(sel?(tmpFilter.mode==='out'?' selected-out':' selected-in'):'');
+  d.id = `fopt-${type}-${key}`;
+  d.innerHTML = `
+    <div class="filter-opt-dot" style="background:${color}"></div>
+    <span class="filter-opt-name">${esc(label)}</span>
+    <span class="filter-opt-cnt">${count}</span>
+    <div class="filter-opt-check">${sel?'✓':''}</div>
+  `;
+  d.onclick = () => {
+    const lst = type==='person' ? tmpFilter.people : tmpFilter.groups;
+    const idx = lst.indexOf(key);
+    if(idx>=0) lst.splice(idx,1); else lst.push(key);
+    const nowSel = lst.includes(key);
+    d.className = 'filter-opt'+(nowSel?(tmpFilter.mode==='out'?' selected-out':' selected-in'):'');
+    d.querySelector('.filter-opt-check').textContent = nowSel?'✓':'';
+  };
+  return d;
+}
+
+function setTmpMode(mode) {
+  tmpFilter.mode = mode;
+  document.getElementById('fmode-out').className=`mode-btn out ${mode==='out'?'active':''}`;
+  document.getElementById('fmode-in').className =`mode-btn in  ${mode==='in' ?'active':''}`;
+
+  // Filter In → tick all (deselect what you don't want shown)
+  // Filter Out → untick all (select what you want hidden)
+  const allPeople = [...new Set(reminders.map(r=>r.author).filter(Boolean))];
+  const allGroups = [...groups];
+  if (mode==='in') {
+    tmpFilter.people = [...allPeople];
+    tmpFilter.groups = [...allGroups];
+  } else {
+    tmpFilter.people = [];
+    tmpFilter.groups = [];
   }
 
-  // ── SIZE ──
-  function onSizeChange(slider) {
-    currentSize = parseInt(slider.value);
-    localStorage.setItem('ms_size', currentSize);
-    applySize(currentSize);
-    updateSliderFill(slider);
+  // Re-render opt states
+  document.querySelectorAll('.filter-opt').forEach(el=>{
+    const parts = el.id.replace('fopt-','').split('-');
+    const type  = parts[0];
+    const key   = parts.slice(1).join('-');
+    const list  = type==='person' ? tmpFilter.people : tmpFilter.groups;
+    const sel   = list.includes(key);
+    el.className = 'filter-opt'+(sel?(mode==='out'?' selected-out':' selected-in'):'');
+    el.querySelector('.filter-opt-check').textContent = sel?'✓':'';
+  });
+}
+
+function applyFilter() {
+  activeFilter = {...tmpFilter};
+  saveFilter(); render(); closeModal('filter-modal');
+}
+
+// ── IMPORT ────────────────────────────────────────────────────
+function openImportModal() {
+  importMode='merge';
+  document.getElementById('import-merge-btn').classList.add('active');
+  document.getElementById('import-overwrite-btn').classList.remove('active');
+  document.getElementById('import-mode-desc').textContent='Adds new reminders from the file. Existing ones are kept — no duplicates.';
+  openModal('import-modal');
+}
+function setImportMode(mode) {
+  importMode=mode;
+  document.getElementById('import-merge-btn').classList.toggle('active', mode==='merge');
+  document.getElementById('import-overwrite-btn').classList.toggle('active', mode==='overwrite');
+  document.getElementById('import-mode-desc').textContent = mode==='merge'
+    ? 'Adds new reminders from the file. Existing ones are kept — no duplicates.'
+    : '⚠️ Replaces ALL current reminders with the imported file. This cannot be undone.';
+}
+function triggerImport() { document.getElementById('import-input').click(); }
+function importData(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const imp=JSON.parse(ev.target.result);
+      if(!Array.isArray(imp)) throw 0;
+      if(importMode==='overwrite'){
+        reminders=imp;
+      } else {
+        const ids=new Set(reminders.map(r=>r.id));
+        const fresh=imp.filter(r=>!ids.has(r.id));
+        reminders=[...fresh,...reminders];
+      }
+      // Merge any new groups
+      imp.forEach(r=>{ if(r.group && !groups.includes(r.group)) groups.push(r.group); });
+      save(); saveGroups(); render(); closeModal('import-modal');
+      toast(importMode==='overwrite'?`Overwrote with ${imp.length} reminder${imp.length!==1?'s':''} ✓`:`Merged ✓`);
+    }catch{ toast('Invalid file ✕'); }
+  };
+  reader.readAsText(file); e.target.value='';
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function exportData() {
+  const b=new Blob([JSON.stringify(reminders,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=`reminders-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); toast('Exported ✓');
+}
+
+// ── SELECTED PILL ─────────────────────────────────────────────
+let selectedPillId = null;
+
+function handlePillTap(id, e) {
+  // Don't intercept check or delete button taps
+  if (e.target.closest('.pill-check') || e.target.closest('.pill-delete')) return;
+
+  if (selectedPillId === id) {
+    // Second tap — open edit modal
+    openEditModal(id);
+  } else {
+    // First tap — select it
+    deselectAll();
+    selectedPillId = id;
+    const el = document.querySelector(`.reminder-pill[data-id="${id}"]`);
+    if (el) el.classList.add('selected');
   }
+}
 
-  function applySize(size) {
-    document.documentElement.style.setProperty('--font-size', size + 'px');
-    sizeSlider.value = size;
-    sizeValue.textContent = size + 'px';
-    updateSliderFill(sizeSlider);
+function deselectAll() {
+  selectedPillId = null;
+  document.querySelectorAll('.reminder-pill.selected').forEach(p=>p.classList.remove('selected'));
+}
+
+// ── EDIT MODAL ────────────────────────────────────────────────
+let editingId     = null;
+let editGroup     = 'General';
+let editColor     = 'green';
+
+function openEditModal(id) {
+  const r = reminders.find(x=>x.id===id);
+  if (!r) return;
+  editingId = id;
+  editGroup = r.group || 'General';
+  editColor = r.color || 'green';
+
+  document.getElementById('edit-title').value = r.title;
+  document.getElementById('edit-note').value  = r.note||'';
+  document.getElementById('edit-title').classList.remove('error');
+  document.getElementById('edit-title-error').classList.remove('show');
+  document.getElementById('edit-add-group-inline').classList.remove('show');
+  document.getElementById('edit-new-group-input').value = '';
+
+  renderEditGroupPills();
+  renderEditColorSwatches();
+
+  deselectAll();
+  openModal('edit-modal');
+  setTimeout(()=>document.getElementById('edit-title').focus(), 320);
+}
+
+function renderEditGroupPills() {
+  const row = document.getElementById('edit-group-pill-row');
+  row.innerHTML = '';
+  groups.forEach(g => {
+    const p = document.createElement('button');
+    p.className = 'group-pill-sel'+(g===editGroup?' active':'');
+    p.textContent = g;
+    p.onclick = () => {
+      editGroup = g;
+      document.querySelectorAll('#edit-group-pill-row .group-pill-sel:not(.add-group-btn)').forEach(b=>b.classList.remove('active'));
+      p.classList.add('active');
+    };
+    row.appendChild(p);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'group-pill-sel add-group-btn';
+  addBtn.textContent = '+ Add Group';
+  addBtn.onclick = () => {
+    const inline = document.getElementById('edit-add-group-inline');
+    inline.classList.toggle('show');
+    if (inline.classList.contains('show')) document.getElementById('edit-new-group-input').focus();
+  };
+  row.appendChild(addBtn);
+}
+
+function renderEditColorSwatches() {
+  const sw = document.getElementById('edit-color-swatches');
+  sw.innerHTML = '';
+  COLORS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'color-swatch'+(c.id===editColor?' selected':'');
+    d.dataset.color = c.id; d.title = c.label;
+    d.innerHTML = `<div class="swatch-dot" style="background:${c.hex};box-shadow:0 0 10px ${c.hex}80"></div><span class="swatch-label" style="color:${c.hex}">${c.label.toUpperCase()}</span>`;
+    d.onclick = () => {
+      editColor = c.id;
+      document.querySelectorAll('#edit-color-swatches .color-swatch').forEach(s=>s.classList.remove('selected'));
+      d.classList.add('selected');
+    };
+    sw.appendChild(d);
+  });
+}
+
+function confirmEditNewGroup() {
+  const input = document.getElementById('edit-new-group-input');
+  const name  = input.value.trim();
+  if (!name || groups.includes(name)) { input.value=''; return; }
+  groups.push(name);
+  saveGroups();
+  editGroup = name;
+  input.value = '';
+  document.getElementById('edit-add-group-inline').classList.remove('show');
+  renderEditGroupPills();
+}
+
+function saveEdit() {
+  const title = document.getElementById('edit-title').value.trim();
+  if (!title) {
+    document.getElementById('edit-title').classList.add('error');
+    document.getElementById('edit-title-error').classList.add('show');
+    return;
   }
+  const r = reminders.find(x=>x.id===editingId);
+  if (!r) return;
+  r.title = title;
+  r.note  = document.getElementById('edit-note').value.trim();
+  r.group = editGroup;
+  r.color = editColor;
+  save(); closeModal('edit-modal'); render(); toast('Reminder updated ✓');
+  if (ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
+}
 
-  function updateSliderFill(slider) {
-    const min = parseInt(slider.min);
-    const max = parseInt(slider.max);
-    const val = parseInt(slider.value);
-    const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
-    slider.style.setProperty('--pct', pct);
+function deleteFromEdit() {
+  reminders = reminders.filter(x=>x.id!==editingId);
+  save(); closeModal('edit-modal'); render(); toast('Removed');
+  if (ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────
+function toggleDone(id,e){
+  e.stopPropagation();
+  const r=reminders.find(x=>x.id===id);
+  if(r){
+    r.done=!r.done; save(); render();
+    if(ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
   }
+}
+function deleteReminder(id,e){
+  e.stopPropagation();
+  reminders=reminders.filter(x=>x.id!==id);
+  save(); render(); toast('Removed');
+  if(ghConfigured()) ghPushAll().catch(e=>console.warn('sync failed',e));
+}
 
-  // ── MODE ──
-  let currentMode = localStorage.getItem('ms_mode') || 'none';
-  const modePopup = document.getElementById('modePopup');
+// ── MODALS ────────────────────────────────────────────────────
+function openModal(id){
+  ['add-modal','edit-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(m=>{ if(m!==id) document.getElementById(m).classList.remove('open'); });
+  document.getElementById(id).classList.add('open');
+  if(id==='add-modal')      populateAddModal();
+  if(id==='filter-modal')   populateFilterModal();
+  if(id==='settings-modal') populateSettingsModal();
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); deselectAll(); }
+function backdropClose(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
 
-  function toggleModePopup() {
-    const isOpen = modePopup.classList.contains('open');
-    if (isOpen) {
-      closeModePopup();
+// Tap on main background deselects
+document.getElementById('main-list').addEventListener('click', e=>{
+  if (!e.target.closest('.reminder-pill')) deselectAll();
+});
+
+// ── HELPERS ───────────────────────────────────────────────────
+function personColor(n){
+  const c=['#00c8d4','#ff4d6d','#f7c948','#3dd68c','#a78bfa','#f472b6'];
+  return c[Math.abs(hashStr(n))%c.length];
+}
+function groupColor(g){
+  const c=['#00c8d4','#3dd68c','#ff8c42','#f472b6','#a78bfa','#f7c948'];
+  return c[Math.abs(hashStr(g))%c.length];
+}
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return h;}
+
+// ── TOAST ─────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ── GITHUB SETTINGS ───────────────────────────────────────────
+function ghConfigured() {
+  return !!(localStorage.getItem('gh_token') && localStorage.getItem('gh_repo'));
+}
+function ghApiUrl() {
+  const repo = localStorage.getItem('gh_repo')||'';
+  const path = localStorage.getItem('gh_path')||'reminders.json';
+  return `https://api.github.com/repos/${repo}/contents/${path}`;
+}
+function ghHeaders() {
+  return { Authorization:`Bearer ${localStorage.getItem('gh_token')}`, Accept:'application/vnd.github.v3+json' };
+}
+
+function populateSettingsModal() {
+  document.getElementById('gh-token').value  = localStorage.getItem('gh_token')||'';
+  document.getElementById('gh-repo').value   = localStorage.getItem('gh_repo')||'';
+  document.getElementById('gh-path').value   = localStorage.getItem('gh_path')||'reminders.json';
+  document.getElementById('gh-branch').value = localStorage.getItem('gh_branch')||'main';
+  const res = document.getElementById('gh-test-result');
+  res.style.display='none'; res.className=''; res.textContent='';
+}
+
+function saveGHSettings() {
+  localStorage.setItem('gh_token',  document.getElementById('gh-token').value.trim());
+  localStorage.setItem('gh_repo',   document.getElementById('gh-repo').value.trim());
+  localStorage.setItem('gh_path',   document.getElementById('gh-path').value.trim()||'reminders.json');
+  localStorage.setItem('gh_branch', document.getElementById('gh-branch').value.trim()||'main');
+  updateSyncRow();
+  toast('Settings saved ✓');
+}
+
+async function testGHSettings() {
+  saveGHSettings();
+  const res = document.getElementById('gh-test-result');
+  res.style.display='block'; res.className=''; res.textContent='Testing…';
+  try {
+    const branch = localStorage.getItem('gh_branch')||'main';
+    const r = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
+    if (r.ok) {
+      res.className='ok';
+      res.textContent='✓ Connected — file found and readable';
+      localStorage.setItem('gh_tested','1');
+      updateSyncRow();
     } else {
-      modePopup.style.display = 'flex';
-      requestAnimationFrame(() => modePopup.classList.add('open'));
-      updateModeUI();
+      const d = await r.json();
+      res.className='err';
+      res.textContent=`✕ ${r.status}: ${d.message||'Check token, repo and file path'}`;
+      localStorage.removeItem('gh_tested');
+      updateSyncRow();
+    }
+  } catch(e) {
+    res.className='err';
+    res.textContent='✕ Network error — check your connection';
+    localStorage.removeItem('gh_tested');
+    updateSyncRow();
+  }
+}
+
+async function ghFetch() {
+  const branch = localStorage.getItem('gh_branch')||'main';
+  const r = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
+  if (!r.ok) return null;
+  const d = await r.json();
+  return JSON.parse(atob(d.content.replace(/\n/g,'')));
+}
+
+async function ghPushAll() {
+  const branch = localStorage.getItem('gh_branch')||'main';
+  // Get current SHA
+  let sha = null;
+  try {
+    const g = await fetch(ghApiUrl()+`?ref=${branch}`, {headers:ghHeaders()});
+    if (g.ok) { const d=await g.json(); sha=d.sha; }
+  } catch(e) {}
+  const body = {
+    message: `Update reminders`,
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(reminders,null,2)))),
+    branch
+  };
+  if (sha) body.sha = sha;
+  const r = await fetch(ghApiUrl(), {
+    method:'PUT',
+    headers:{...ghHeaders(),'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(await r.text());
+}
+
+// ── SYNC ROW ──────────────────────────────────────────────────
+function updateSyncRow() {
+  const configured = ghConfigured();
+  const row   = document.getElementById('sync-row');
+  const track = document.querySelector('.toggle-track');
+  const sub   = document.getElementById('sync-sub');
+  const cb    = document.getElementById('sync-enabled');
+
+  if (!configured) {
+    row.classList.add('disabled');
+    sub.textContent = 'Configure in ⚙️ Settings first';
+    cb.checked = false;
+    track.classList.remove('on');
+  } else {
+    row.classList.remove('disabled');
+    sub.textContent = 'Pulls on load · pushes on add';
+    // Default on if configured
+    if (cb.checked === false && !cb.dataset.manuallySet) {
+      cb.checked = true;
+      track.classList.add('on');
     }
   }
+}
 
-  function closeModePopup() {
-    modePopup.classList.remove('open');
-    setTimeout(() => { if (!modePopup.classList.contains('open')) modePopup.style.display = 'none'; }, 200);
-  }
+function toggleSync() {
+  if (!ghConfigured()) return;
+  const cb    = document.getElementById('sync-enabled');
+  const track = document.querySelector('.toggle-track');
+  cb.checked = !cb.checked;
+  cb.dataset.manuallySet = '1';
+  track.classList.toggle('on', cb.checked);
+}
 
-  function setMode(mode) {
-    currentMode = mode;
-    localStorage.setItem('ms_mode', mode);
-    updateModeUI();
-    closeModePopup();
-    textarea.focus();
-  }
+function syncEnabled() {
+  return ghConfigured() && document.getElementById('sync-enabled').checked;
+}
 
-  function updateModeUI() {
-    ['none','bullet','number'].forEach(m => {
-      document.getElementById('mode' + m.charAt(0).toUpperCase() + m.slice(1))
-        .classList.toggle('active', m === currentMode);
+// ── KEYBOARD ──────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') ['add-modal','edit-modal','filter-modal','import-modal','info-modal','settings-modal'].forEach(closeModal);
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openAddModal(null);}
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  render();
+  if (!ghConfigured()) return;
+
+  try {
+    const data = await ghFetch();
+    if (!data) return;
+
+    // GitHub is the master copy — start from it
+    // Keep anything local that GitHub doesn't have yet (added offline)
+    const ghIds = new Set(data.map(r=>r.id));
+    const localOnly = reminders.filter(r=>!ghIds.has(r.id));
+
+    // Build full list: GitHub data + anything added locally but not yet pushed
+    reminders = [...localOnly, ...data];
+
+    // Merge groups and names
+    data.forEach(r=>{
+      if(r.group  && !groups.includes(r.group))  groups.push(r.group);
+      if(r.author && !names.includes(r.author))  names.push(r.author);
     });
-  }
 
-  // Handle Enter key for list modes
-  textarea.addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
-    if (currentMode === 'none') return;
+    save(); saveGroups(); saveNames(); render();
 
-    e.preventDefault();
-    const { selectionStart, selectionEnd, value } = textarea;
-
-    if (currentMode === 'bullet') {
-      const lines = value.substring(0, selectionStart).split('\n');
-      const currentLine = lines[lines.length - 1];
-      // If line is just a bullet, remove it (exit list)
-      if (currentLine.trim() === '•') {
-        const newVal = value.substring(0, selectionStart - currentLine.length) + value.substring(selectionEnd);
-        textarea.value = newVal;
-        textarea.selectionStart = textarea.selectionEnd = selectionStart - currentLine.length;
-      } else {
-        const insert = '\n• ';
-        textarea.value = value.substring(0, selectionStart) + insert + value.substring(selectionEnd);
-        textarea.selectionStart = textarea.selectionEnd = selectionStart + insert.length;
-      }
-    } else if (currentMode === 'number') {
-      const lines = value.substring(0, selectionStart).split('\n');
-      const currentLine = lines[lines.length - 1];
-      const match = currentLine.match(/^(\d+)\.\s/);
-      // If line is just a number, exit list
-      if (match && currentLine.trim() === match[0].trim()) {
-        const newVal = value.substring(0, selectionStart - currentLine.length) + value.substring(selectionEnd);
-        textarea.value = newVal;
-        textarea.selectionStart = textarea.selectionEnd = selectionStart - currentLine.length;
-      } else {
-        const nextNum = match ? parseInt(match[1]) + 1 : 1;
-        const insert = '\n' + nextNum + '. ';
-        textarea.value = value.substring(0, selectionStart) + insert + value.substring(selectionEnd);
-        textarea.selectionStart = textarea.selectionEnd = selectionStart + insert.length;
-      }
+    // If we had local-only items, push them up now
+    if (localOnly.length > 0) {
+      await ghPushAll();
+      toast(`Synced ${localOnly.length} local reminder${localOnly.length!==1?'s':''} to GitHub ✓`);
     }
 
-    localStorage.setItem('ms_strategy', textarea.value);
-    updateWordCount();
-  });
-
-  // Auto-prefix first line when mode is active and box is empty
-  textarea.addEventListener('focus', () => {
-    if (textarea.value === '' && currentMode !== 'none') {
-      if (currentMode === 'bullet') textarea.value = '• ';
-      if (currentMode === 'number') textarea.value = '1. ';
-      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
-    }
-  });
-
-  // Close mode popup when tapping outside
-  document.addEventListener('click', e => {
-    if (!modePopup.contains(e.target) && !e.target.closest('.mode-btn')) {
-      closeModePopup();
-    }
-  });
-
-  
-  function openSettings() {
-    overlay.classList.add('open');
+  } catch(e) {
+    console.warn('GitHub pull failed on load', e);
+    // Fall back to whatever is in localStorage silently
   }
+}
 
-  function closeSettings() {
-    overlay.classList.remove('open');
-  }
-
-  // Prevent body scroll when textarea scrolls
-  textarea.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
-
-  init();
+init();
 </script>
 </body>
 </html>
