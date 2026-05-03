@@ -63,7 +63,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 28px 20px 12px;
+    padding: 28px 20px 20px;
     flex-shrink: 0;
     z-index: 10;
   }
@@ -87,6 +87,115 @@
     font-style: italic;
     font-size: 0.85em;
     letter-spacing: 0.22em;
+  }
+
+  /* ── MODE BUTTON ── */
+  .mode-btn {
+    position: absolute;
+    left: 18px;
+    top: 26px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
+  }
+
+  .mode-btn:active {
+    background: rgba(201,168,76,0.18);
+    border-color: rgba(201,168,76,0.6);
+    transform: scale(0.93);
+  }
+
+  .mode-btn svg {
+    width: 17px;
+    height: 17px;
+    stroke: var(--gold);
+    opacity: 0.8;
+  }
+
+  /* ── MODE POPUP ── */
+  .mode-popup {
+    position: fixed;
+    top: 80px;
+    left: 18px;
+    z-index: 200;
+    background: linear-gradient(160deg, #181508, #110f07);
+    border: 1px solid rgba(201,168,76,0.28);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.06);
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 170px;
+    transform-origin: top left;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), opacity 0.18s ease;
+  }
+
+  .mode-popup.open {
+    display: flex;
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .mode-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    touch-action: manipulation;
+  }
+
+  .mode-option:active,
+  .mode-option.active {
+    background: rgba(201,168,76,0.12);
+  }
+
+  .mode-option.active .mode-icon {
+    opacity: 1;
+    color: var(--gold-light);
+  }
+
+  .mode-option.active .mode-label {
+    color: var(--gold-light);
+  }
+
+  .mode-icon {
+    font-size: 16px;
+    opacity: 0.55;
+    color: var(--gold);
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+    font-family: monospace;
+    font-style: normal;
+    line-height: 1;
+  }
+
+  .mode-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: rgba(245,230,184,0.65);
+    line-height: 1;
+  }
+
+  .mode-divider {
+    height: 1px;
+    background: rgba(201,168,76,0.12);
+    margin: 2px 0;
   }
 
   /* ── SETTINGS BUTTON ── */
@@ -125,7 +234,7 @@
   .card-wrap {
     flex: 1;
     width: 100%;
-    padding: 0 16px 20px;
+    padding: 8px 16px 20px;
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -472,9 +581,40 @@
 </head>
 <body>
 
+<!-- Mode Popup -->
+<div class="mode-popup" id="modePopup">
+  <div class="mode-option" id="modeNone" onclick="setMode('none')">
+    <span class="mode-icon">¶</span>
+    <span class="mode-label">Free Write</span>
+  </div>
+  <div class="mode-divider"></div>
+  <div class="mode-option" id="modeBullet" onclick="setMode('bullet')">
+    <span class="mode-icon">•</span>
+    <span class="mode-label">Bullet Points</span>
+  </div>
+  <div class="mode-divider"></div>
+  <div class="mode-option" id="modeNumber" onclick="setMode('number')">
+    <span class="mode-icon">1.</span>
+    <span class="mode-label">Numbered List</span>
+  </div>
+</div>
+
 <!-- Header -->
 <div class="header">
   <div class="logo">Morning <span>Strategise</span></div>
+
+  <!-- Mode Button -->
+  <button class="mode-btn" onclick="toggleModePopup()" aria-label="List mode">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="8" y1="6" x2="21" y2="6"/>
+      <line x1="8" y1="12" x2="21" y2="12"/>
+      <line x1="8" y1="18" x2="21" y2="18"/>
+      <circle cx="3" cy="6" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="3" cy="12" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="3" cy="18" r="1" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
+
   <button class="settings-btn" onclick="openSettings()" aria-label="Settings">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="3"/>
@@ -570,6 +710,9 @@
       updateWordCount();
     });
 
+    updateModeUI();
+    modePopup.style.display = 'none';
+
     // Update slider fill on load
     updateSliderFill(sizeSlider);
   }
@@ -637,7 +780,100 @@
     slider.style.setProperty('--pct', pct);
   }
 
-  // ── SETTINGS PANEL ──
+  // ── MODE ──
+  let currentMode = localStorage.getItem('ms_mode') || 'none';
+  const modePopup = document.getElementById('modePopup');
+
+  function toggleModePopup() {
+    const isOpen = modePopup.classList.contains('open');
+    if (isOpen) {
+      closeModePopup();
+    } else {
+      modePopup.style.display = 'flex';
+      requestAnimationFrame(() => modePopup.classList.add('open'));
+      updateModeUI();
+    }
+  }
+
+  function closeModePopup() {
+    modePopup.classList.remove('open');
+    setTimeout(() => { if (!modePopup.classList.contains('open')) modePopup.style.display = 'none'; }, 200);
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    localStorage.setItem('ms_mode', mode);
+    updateModeUI();
+    closeModePopup();
+    textarea.focus();
+  }
+
+  function updateModeUI() {
+    ['none','bullet','number'].forEach(m => {
+      document.getElementById('mode' + m.charAt(0).toUpperCase() + m.slice(1))
+        .classList.toggle('active', m === currentMode);
+    });
+  }
+
+  // Handle Enter key for list modes
+  textarea.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (currentMode === 'none') return;
+
+    e.preventDefault();
+    const { selectionStart, selectionEnd, value } = textarea;
+
+    if (currentMode === 'bullet') {
+      const lines = value.substring(0, selectionStart).split('\n');
+      const currentLine = lines[lines.length - 1];
+      // If line is just a bullet, remove it (exit list)
+      if (currentLine.trim() === '•') {
+        const newVal = value.substring(0, selectionStart - currentLine.length) + value.substring(selectionEnd);
+        textarea.value = newVal;
+        textarea.selectionStart = textarea.selectionEnd = selectionStart - currentLine.length;
+      } else {
+        const insert = '\n• ';
+        textarea.value = value.substring(0, selectionStart) + insert + value.substring(selectionEnd);
+        textarea.selectionStart = textarea.selectionEnd = selectionStart + insert.length;
+      }
+    } else if (currentMode === 'number') {
+      const lines = value.substring(0, selectionStart).split('\n');
+      const currentLine = lines[lines.length - 1];
+      const match = currentLine.match(/^(\d+)\.\s/);
+      // If line is just a number, exit list
+      if (match && currentLine.trim() === match[0].trim()) {
+        const newVal = value.substring(0, selectionStart - currentLine.length) + value.substring(selectionEnd);
+        textarea.value = newVal;
+        textarea.selectionStart = textarea.selectionEnd = selectionStart - currentLine.length;
+      } else {
+        const nextNum = match ? parseInt(match[1]) + 1 : 1;
+        const insert = '\n' + nextNum + '. ';
+        textarea.value = value.substring(0, selectionStart) + insert + value.substring(selectionEnd);
+        textarea.selectionStart = textarea.selectionEnd = selectionStart + insert.length;
+      }
+    }
+
+    localStorage.setItem('ms_strategy', textarea.value);
+    updateWordCount();
+  });
+
+  // Auto-prefix first line when mode is active and box is empty
+  textarea.addEventListener('focus', () => {
+    if (textarea.value === '' && currentMode !== 'none') {
+      if (currentMode === 'bullet') textarea.value = '• ';
+      if (currentMode === 'number') textarea.value = '1. ';
+      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+    }
+  });
+
+  // Close mode popup when tapping outside
+  document.addEventListener('click', e => {
+    if (!modePopup.contains(e.target) && !e.target.closest('.mode-btn')) {
+      closeModePopup();
+    }
+  });
+
+  
   function openSettings() {
     overlay.classList.add('open');
   }
